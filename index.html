@@ -1,0 +1,1031 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMS ·  Container Terminal · v11</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+    <!-- ════ LOGIN ════ -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">
+                <div class="login-emblem">⚓</div>
+                <h1>Terminal TMS</h1>
+                <p>Mombasa Container Terminal · Management System</p>
+                <div class="sys-badge"><span class="dot"></span> System Online · v11.0 Production</div>
+            </div>
+            <div class="login-field"><label>Username</label><input type="text" id="loginUser" placeholder="Enter username" autocomplete="username"></div>
+            <div class="login-field"><label>Password</label><input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password"></div>
+            <button class="btn-login" onclick="doLogin()">Sign In to Terminal TMS</button>
+            <div id="loginError">⚠️ Invalid credentials. Access denied.</div>
+            <div class="login-footer"><div>Kenya Ports Authority · info@kpa.go.ke</div><div>Authorized personnel only · All activity is logged &amp; audited</div></div>
+        </div>
+    </div>
+
+    <!-- ════ APP SHELL ════ -->
+    <div class="shell" id="appShell" style="display:none">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sb-logo">
+                <div class="sb-logo-kpa"><div style="width:40px;height:40px;border-radius:10px;background:rgba(56,189,248,0.12);display:flex;align-items:center;justify-content:center;font-size:20px">⚓</div></div>
+                <div class="sb-brand">Terminal TMS</div>
+                <div class="sb-sub">Kenya Ports Authority · Terminal Control</div>
+                <div class="sb-pill"><span class="dot"></span> Live · Mombasa MCT</div>
+            </div>
+            <div class="sb-section">Overview</div>
+            <div class="nav-item active" data-tab="dashboard"><span class="ni">📊</span>Dashboard</div>
+            <div class="nav-item" data-tab="containers"><span class="ni">📦</span>All Containers <span class="nav-badge" id="nb-total">0</span></div>
+            <div class="sb-section">Pre-Advice &amp; Gate</div>
+            <div class="nav-item" data-tab="preadvice"><span class="ni">📋</span>Pre-Advice (Single)</div>
+            <div class="nav-item" data-tab="preadvice-bulk"><span class="ni">📤</span>Bulk Pre-Advice</div>
+            <div class="nav-item" data-tab="gate"><span class="ni">🚛</span>Gate In / Position Slip</div>
+            <div class="nav-item" data-tab="position-slips"><span class="ni">🏷️</span>Position Slips</div>
+            <div class="sb-section">Yard &amp; Vessel</div>
+            <div class="nav-item" data-tab="vessel-to-yard"><span class="ni">🚢</span>Vessel → Yard (Empties)</div>
+            <div class="nav-item" data-tab="yard"><span class="ni">📍</span>Yard Operations</div>
+            <div class="nav-item" data-tab="shifting"><span class="ni">🔀</span>Shifting <span class="nav-badge" id="nb-shift">0</span></div>
+            <div class="nav-item" data-tab="keysite"><span class="ni">⚓</span>Pre-Stake / Key Site</div>
+            <div class="nav-item" data-tab="vessel"><span class="ni">🛳️</span>Vessel Loading</div>
+            <div class="nav-item" data-tab="shutouts"><span class="ni">🚫</span>Shutouts <span class="nav-badge" id="nb-shutout">0</span></div>
+            <div class="nav-item" data-tab="random-loading"><span class="ni">🎲</span>Random Loading <span class="nav-badge" id="nb-random">0</span></div>
+            <div class="sb-section">SGR (ICD)</div>
+            <div class="nav-item" data-tab="sgr"><span class="ni">🚃</span>SGR Workflow <span class="nav-badge" id="nb-sgr">0</span></div>
+            <div class="sb-section">Imports / Full</div>
+            <div class="nav-item" data-tab="imports-full"><span class="ni">📥</span>Imports / Full <span class="nav-badge" id="nb-import">0</span></div>
+            <div class="sb-section">Intelligence</div>
+            <div class="nav-item" data-tab="reports"><span class="ni">📈</span>Reports &amp; Analytics</div>
+            <div class="nav-item" data-tab="logs"><span class="ni">📜</span>Audit Logs</div>
+            <div class="sb-user">
+                <div class="sb-user-info">
+                    <div class="sb-avatar" id="sbAvatar">A</div>
+                    <div><div class="sb-user-name" id="sbUserName">Administrator</div><div class="sb-user-role">Terminal Controller · KPA MCT</div></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.5rem">
+                    <button class="btn-logout" onclick="doLogout()" style="flex:1">🔓 Sign Out</button>
+                    <button class="btn-clear-system" onclick="resetAllSystemData()" title="Clear all system data"></button>
+                </div>
+            </div>
+            <div class="sb-footer"><div id="syncStatus" style="font-weight:600;margin-bottom:0.2rem">🟡 Syncing…</div><div>info@kpa.go.ke · +254 41 222 5143</div><div>v11.0 Production · Mombasa MCT</div></div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main" id="mainContent">
+
+            <!-- ─── DASHBOARD ─── -->
+            <div class="tab-pane active" id="tab-dashboard">
+
+                <!-- ═══ REFINED DASHBOARD HEADER ═══ -->
+                <div class="dash-header-v2">
+
+                    <!-- Top bar -->
+                    <div class="dv2-topbar">
+                        <div class="dv2-title-block">
+                            <h2 class="dv2-title">Operations command centre</h2>
+                            <div class="dv2-meta">
+                                <span class="pulse-dot-sm"></span>
+                                <span>Live · Mombasa Container Terminal ·</span>
+                                <span id="dashClock" class="dv2-clock-inline">—</span>
+                            </div>
+                        </div>
+                        <div class="dv2-actions">
+                            <div class="dv2-date-chip" id="dashDateChip">—</div>
+                            <button class="dv2-btn" onclick="renderDashboard()">↺ Refresh</button>
+                            <button class="dv2-btn dv2-btn-primary" onclick="exportDashboardPDF()">↓ Export PDF</button>
+                        </div>
+                    </div>
+
+                    <!-- Alert banner -->
+                    <div id="dashAlertBanner"></div>
+
+                    <!-- Validation strip -->
+                    <div class="dv2-val-strip" id="dv2ValStrip"></div>
+
+                    <!-- Primary KPIs -->
+                    <div class="dv2-kpi-row" id="dv2KpiRow"></div>
+
+                    <!-- Secondary metrics -->
+                    <div class="dv2-sec-row" id="dv2SecRow"></div>
+
+                    <!-- Gate distribution -->
+                    <div class="dv2-gate-row" id="dv2GateRow"></div>
+
+                    <!-- Shipping line summary -->
+                    <div class="dv2-panel">
+                        <div class="dv2-panel-title">Summary by shipping line</div>
+                        <div class="dv2-table-wrap">
+                            <table class="dv2-line-table">
+                                <thead>
+                                    <tr>
+                                        <th>Line</th>
+                                        <th>Total</th>
+                                        <th>Pre-adv</th>
+                                        <th>Gated in</th>
+                                        <th>Key site</th>
+                                        <th>Loaded</th>
+                                        <th>SGR/ICD</th>
+                                        <th>Overdue</th>
+                                        <th>Avg dwell</th>
+                                        <th>Shutouts</th>
+                                        <th>Spread</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dv2LineTbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Bottom 3-column grid -->
+                    <div class="dash-grid-bottom">
+                        <div class="card">
+                            <div class="card-title">⏳ Dwell Time Analysis</div>
+                            <div id="dwellBuckets" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.8rem"></div>
+                            <div class="divider"></div>
+                            <div class="card-title" style="margin-top:0.5rem">🔴 Overdue Free Time</div>
+                            <div id="overdueList" style="max-height:140px;overflow-y:auto;display:flex;flex-direction:column;gap:0.3rem"></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">🔄 Workflow Snapshot</div>
+                            <div id="wfSnapshot" style="display:flex;flex-direction:column;gap:0.4rem"></div>
+                            <div class="divider"></div>
+                            <div class="card-title">🛳️ Vessels in Play</div>
+                            <div id="vesselSnapshot" style="display:flex;flex-direction:column;gap:0.3rem"></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">📋 Recent Activity</div>
+                            <div id="recentActivity" style="display:flex;flex-direction:column;gap:0.3rem;max-height:320px;overflow-y:auto"></div>
+                        </div>
+                    </div>
+
+                </div><!-- end dash-header-v2 -->
+            </div>
+
+            <!-- ─── ALL CONTAINERS ─── -->
+            <div class="tab-pane" id="tab-containers">
+                <div class="page-hdr">
+                    <div><h2>Container Inventory</h2><div class="sub">Full port empties database — all traceable to pre-advice origin</div></div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-secondary" onclick="exportCSV()">📥 CSV</button>
+                        <button class="btn btn-sm btn-secondary" onclick="exportContainerPDF()">📄 PDF</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="flex gap-2 flex-wrap mb-2" style="align-items:flex-end">
+                        <div style="flex:1;min-width:200px"><label style="margin-bottom:4px">Search</label><input id="srch" placeholder="🔍 ID / Line / Vessel / Yard..." oninput="renderTable()"></div>
+                        <div style="min-width:160px">
+                            <label style="margin-bottom:4px">Status</label>
+                            <select id="fStatus" onchange="renderTable()"><option value="">All Status</option><option>PREADVISED</option><option>GATED_IN</option><option>ON_WAGON</option><option>RECEIVED_SGR</option><option>VESSEL_TO_YARD</option><option>KEY_SITE</option><option>LOADED_VESSEL</option><option>SHUTOUT</option><option>OUT_OF_PORT</option></select>
+                        </div>
+                        <div style="min-width:140px">
+                            <label style="margin-bottom:4px">Entry Point</label>
+                            <select id="fSource" onchange="renderTable()"><option value="">All Sources</option><option>Gate18</option><option>Gate24</option><option>ICD</option><option>Vessel</option></select>
+                        </div>
+                        <div style="min-width:140px">
+                            <label style="margin-bottom:4px">Shipping Line</label>
+                            <select id="fLine" onchange="renderTable()"><option value="">All Lines</option></select>
+                        </div>
+                        <div style="min-width:130px">
+                            <label style="margin-bottom:4px">Vessel</label>
+                            <select id="fVessel" onchange="renderTable()"><option value="">All Vessels</option></select>
+                        </div>
+                    </div>
+                    <div class="table-wrap"><table><thead><tr><th>Container ID</th><th>Line</th><th>Entry Point</th><th>Status</th><th>Vessel / Voyage</th><th>Yard</th><th>Slip No.</th><th>Free Days</th><th>Dwell</th><th>Clerk</th><th>Action</th></tr></thead><tbody id="tBody"></tbody></table></div>
+                    <div class="mt-2 text-xs text-muted" id="tCount"></div>
+                </div>
+            </div>
+
+            <!-- ─── PRE-ADVICE SINGLE ─── -->
+            <div class="tab-pane" id="tab-preadvice">
+                <div class="page-hdr"><div><h2>Pre-Advice Container</h2><div class="sub">Register single container — origin of all port movements</div></div></div>
+                <div class="card" style="max-width:820px">
+                    <div class="section-tag">📋 All containers must be pre-advised before any port movement. Container ID is the master key for all subsequent operations.</div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Container ID *</label><input id="pa-id" placeholder="e.g. TXGU7745354" oninput="this.value=this.value.toUpperCase();validateContainerId(this)"></div>
+                        <div class="form-group"><label>Shipping Line *</label><input id="pa-line" placeholder="MSC, MAERSK, EVG..." list="lineList"><datalist id="lineList"><option>MSC</option><option>MAERSK</option><option>EVG</option><option>CMA CGM</option><option>HAPAG-LLOYD</option><option>COSCO</option><option>OOCL</option><option>PIL</option><option>ONE</option><option>HMM</option></datalist></div>
+                        <div class="form-group"><label>Vessel Name *</label><input id="pa-vessel" placeholder="e.g. X-PRESS ANTARES"></div>
+                        <div class="form-group"><label>Voyage</label><input id="pa-voyage" placeholder="26016W/26016E"></div>
+                        <div class="form-group"><label>POD</label><input id="pa-pod" placeholder="e.g. CNNSA"></div>
+                        <div class="form-group">
+                            <label>Container Type</label>
+                            <select id="pa-type"><option value="20G0">20' Dry (20G0)</option><option value="40G0">40' Dry (40G0)</option><option value="40HC">40' HC (40HC)</option><option value="45G0">45' Dry (45G0)</option><option value="20RF">20' Reefer (20RF)</option><option value="40RF">40' Reefer (40RF)</option><option value="20OT">20' Open Top</option><option value="40OT">40' Open Top</option><option value="20FR">20' Flat Rack</option><option value="40FR">40' Flat Rack</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Entry Point *</label>
+                            <select id="pa-source">
+                                <option value="Gate18">🚛 Gate 18 (Depot Repatriation)</option>
+                                <option value="Gate24">🚛 Gate 24 (Depot Repatriation)</option>
+                                <option value="ICD">🚃 ICD / SGR</option>
+                                <option value="Vessel">🛳️ Vessel (Discharge to Yard)</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>ISO Code</label><input id="pa-iso" placeholder="40G0"></div>
+                        <div class="form-group"><label>Weight (kg)</label><input id="pa-weight" placeholder="e.g. 4444" type="number" min="0"></div>
+                        <div class="form-group"><label>Height</label><input id="pa-height" placeholder="e.g. 8'"></div>
+                    </div>
+                    <div class="mt-3 btn-group">
+                        <button class="btn btn-primary" onclick="createContainer()">➕ Save Pre-Advice</button>
+                        <button class="btn btn-secondary" onclick="clearPAForm()">✕ Clear Form</button>
+                    </div>
+                    <div id="pa-validation" class="mt-2 text-sm" style="color:#fb7185"></div>
+                </div>
+            </div>
+
+            <!-- ─── BULK PRE-ADVICE ─── -->
+            <div class="tab-pane" id="tab-preadvice-bulk">
+                <div class="page-hdr"><div><h2>Bulk Pre-Advice Upload</h2><div class="sub">Upload KPA pre-advice list CSV — mass container registration</div></div></div>
+                <div class="card">
+                    <div class="section-tag">📋 CSV column order: Container ID, Shipping Line, Vessel, Voyage, POD, Type, Source (Gate18/Gate24/ICD/Vessel)</div>
+                    <div class="drop-zone" id="bulkDZ" onclick="document.getElementById('bulkFile').click()">
+                        <div class="dz-icon">📁</div><div class="dz-title">Drag &amp; drop CSV file or click to browse</div><div class="dz-sub">.csv format · First row must be column headers</div>
+                        <input type="file" id="bulkFile" accept=".csv" class="hidden" onchange="handleBulkFile(event)">
+                    </div>
+                    <div id="bulkPreview" class="hidden mt-3">
+                        <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
+                            <div class="card-title" style="margin:0">📋 Preview — <span id="bCount">0</span> containers</div>
+                            <div class="btn-group"><button class="btn btn-success btn-sm" onclick="commitBulk()">✅ Commit All Valid</button><button class="btn btn-danger btn-sm" onclick="clearBulk()">✕ Clear</button></div>
+                        </div>
+                        <div class="scroll-table table-wrap"><table><thead><tr><th>#</th><th>Container ID</th><th>Line</th><th>Vessel</th><th>Voyage</th><th>Type</th><th>Source</th><th>Valid</th></tr></thead><tbody id="bBody"></tbody></table></div>
+                        <div id="bErrors" class="mt-2 text-sm text-danger"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── GATE IN ─── -->
+            <div class="tab-pane" id="tab-gate">
+                <div class="page-hdr"><div><h2>Gate In &amp; Position Slip</h2><div class="sub">Gate 18 / Gate 24 — Depot repatriation container receipt</div></div></div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title">🚛 Gate In Container</div>
+                        <div class="section-tag">Container must be pre-advised before gate-in. System validates pre-advice status automatically.</div>
+                        <div class="form-group mb-2">
+                            <label>Container ID *</label>
+                            <select id="g-id" onchange="gateAutofill()"><option value="">— Select Pre-Advised Container —</option></select>
+                        </div>
+                        <div id="g-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
+                        <div class="form-group mb-2">
+                            <label>Gate *</label>
+                            <select id="g-gate"><option value="Gate18">Gate 18</option><option value="Gate24">Gate 24</option></select>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label>Yard / Block (Position Slip) *</label>
+                            <select id="g-yard">
+                                <option value="">— Select Yard/Block —</option>
+                                <option>BLOCK-A-01</option>
+                                <option>BLOCK-A-02</option>
+                                <option>BLOCK-A-03</option>
+                                <option>BLOCK-B-01</option>
+                                <option>BLOCK-B-02</option>
+                                <option>BLOCK-B-03</option>
+                                <option>BLOCK-C-01</option>
+                                <option>BLOCK-C-02</option>
+                                <option>BLOCK-C-03</option>
+                                <option>BLOCK-D-01</option>
+                                <option>BLOCK-D-02</option>
+                                <option>G2203</option>
+                                <option>G2204</option>
+                                <option>G2205</option>
+                                <option>SGR-YARD</option>
+                                <option>HOLDING-AREA</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-2"><label>Truck Plate No.</label><input id="g-plate" placeholder="e.g. KTCB990N" oninput="this.value=this.value.toUpperCase()"></div>
+                        <div class="form-group mb-2"><label>Transport Company</label><input id="g-transco" placeholder="e.g. Logistic Solutions Limited"></div>
+                        <div class="form-group mb-2"><label>Gate Clerk</label><input id="g-clerk" placeholder="Clerk full name"></div>
+                        <div class="form-group mb-2">
+                            <label>Trans Type</label>
+                            <select id="g-transtype"><option value="TRUCK">TRUCK</option><option value="RAIL">RAIL</option><option value="VESSEL">VESSEL</option></select>
+                        </div>
+                        <button class="btn btn-primary" onclick="gateIn()" style="width:100%;margin-top:0.6rem">✅ Gate In &amp; Generate Position Slip</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🏷️ Last Position Slip Generated</div>
+                        <div id="slipPreviewBox"><div style="text-align:center;color:var(--text-3);padding:3rem 0;font-size:0.82rem">Gate in a container to generate its position slip</div></div>
+                        <div id="slipPreviewBtns" class="hidden mt-3 btn-group">
+                            <button class="btn btn-primary btn-sm" onclick="printLastSlip()">🖨️ Print Slip</button>
+                            <button class="btn btn-secondary btn-sm" onclick="pdfLastSlip()">📄 Save PDF</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── POSITION SLIPS ─── -->
+            <div class="tab-pane" id="tab-position-slips">
+                <div class="page-hdr">
+                    <div><h2>Position Slips</h2><div class="sub">All issued yard/block assignment slips — printable &amp; exportable</div></div>
+                    <div class="btn-group"><button class="btn btn-sm btn-secondary" onclick="exportSlipsCSV()">📥 Export Slips CSV</button></div>
+                </div>
+                <div class="card">
+                    <div class="flex gap-2 flex-wrap mb-2"><input id="slipSearch" placeholder="🔍 Search slip / container / yard..." style="max-width:280px" oninput="renderSlips()"></div>
+                    <div class="table-wrap"><table><thead><tr><th>Slip No.</th><th>Container ID</th><th>Line</th><th>Vessel</th><th>Yard / Block</th><th>Truck Plate</th><th>Trans Co.</th><th>Trans Type</th><th>Clerk</th><th>Issued</th><th>Print</th></tr></thead><tbody id="slipBody"></tbody></table></div>
+                    <div class="mt-2 text-xs text-muted" id="slipCount"></div>
+                </div>
+            </div>
+
+            <!-- ─── VESSEL TO YARD ─── -->
+            <div class="tab-pane" id="tab-vessel-to-yard">
+                <div class="page-hdr"><div><h2>Vessel → Yard (Empties)</h2><div class="sub">Discharge empty containers from vessel directly to yard blocks</div></div></div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title">🚢 Discharge Empty from Vessel</div>
+                        <div class="section-tag">Container must be pre-advised with source: Vessel. Only vessel-source containers are accepted here.</div>
+                        <div class="form-group mb-2">
+                            <label>Container ID *</label>
+                            <select id="vy-id" onchange="vyAutofill()"><option value="">— Select Pre-Advised (Vessel) Container —</option></select>
+                        </div>
+                        <div id="vy-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
+                        <div class="form-group mb-2">
+                            <label>Yard / Block *</label>
+                            <select id="vy-yard">
+                                <option value="">— Select Yard —</option>
+                                <option>BLOCK-A-01</option>
+                                <option>BLOCK-A-02</option>
+                                <option>BLOCK-A-03</option>
+                                <option>BLOCK-B-01</option>
+                                <option>BLOCK-B-02</option>
+                                <option>BLOCK-C-01</option>
+                                <option>BLOCK-C-02</option>
+                                <option>BLOCK-D-01</option>
+                                <option>HOLDING-AREA</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-2"><label>Vessel Bay / Position</label><input id="vy-bay" placeholder="e.g. BAY-02-T04"></div>
+                        <div class="form-group mb-2"><label>Receiving Clerk</label><input id="vy-clerk" placeholder="Clerk full name"></div>
+                        <div class="form-group mb-2"><label>Remarks</label><input id="vy-remark" placeholder="Optional remarks"></div>
+                        <button class="btn btn-primary" onclick="vesselToYard()" style="width:100%">⚓ Receive &amp; Place in Yard</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">📊 Vessel-Sourced Empties in Yard</div>
+                        <div class="table-wrap"><table><thead><tr><th>Container ID</th><th>Line</th><th>Vessel</th><th>Yard</th><th>Dwell</th><th>Free Days Left</th></tr></thead><tbody id="vesselYardBody"></tbody></table></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── YARD OPS ─── -->
+            <div class="tab-pane" id="tab-yard">
+                <div class="page-hdr"><div><h2>Yard Operations</h2><div class="sub">Move containers to key site, vessel, or out of port</div></div></div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title">📍 Yard Move / Status Transition</div>
+                        <div class="form-group mb-2">
+                            <label>Container ID *</label>
+                            <select id="y-id" onchange="yardAutofill()"><option value="">— Select Container —</option></select>
+                        </div>
+                        <div id="y-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
+                        <div class="form-group mb-2">
+                            <label>Action</label>
+                            <select id="y-action" onchange="toggleYardVesselFields()">
+                                <option value="KEY_SITE">⚓ Move to Key Site (Pre-Stake)</option>
+                                <option value="LOADED_VESSEL">🚢 Direct to Vessel Load</option>
+                                <option value="OUT_OF_PORT">🚪 Move Out of Port</option>
+                            </select>
+                        </div>
+                        <div id="y-vessel-fields" class="hidden">
+                            <div class="form-group mb-2"><label>Actual Vessel Loaded</label><input id="y-actual-vessel" placeholder="Designated vessel auto-used if blank" oninput="checkRandomLoadUI('y')"></div>
+                            <div class="form-group mb-2"><label>Actual Voyage</label><input id="y-actual-voyage" placeholder="Voyage (if different)"></div>
+                            <div class="form-group mb-2"><label>Loading Clerk</label><input id="y-clerk" placeholder="Clerk name"></div>
+                        </div>
+                        <div id="y-random-block" class="hidden mb-2" style="background:rgba(251,146,60,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(251,146,60,0.2)">
+                            <div class="text-xs" style="color:var(--orange);font-weight:700;margin-bottom:0.5rem">🎲 RANDOM LOADING DETECTED — actual vessel differs from designated. A reason is required.</div>
+                            <div class="form-group">
+                                <label>Random Loading Reason *</label>
+                                <select id="y-random-reason">
+                                    <option value="">— Select Reason —</option>
+                                    <option value="Vessel Planning">Vessel Planning</option>
+                                    <option value="Yard Management">Yard Management</option>
+                                    <option value="Shutout Replacement">Shutout Replacement</option>
+                                    <option value="Space Optimization">Space Optimization</option>
+                                    <option value="Documentation Correction">Documentation Correction</option>
+                                    <option value="Line Instruction">Shipping Line Instruction</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group mb-2"><label>Remarks</label><input id="y-remark" placeholder="Optional remarks"></div>
+                        <button class="btn btn-primary" onclick="yardMove()" style="width:100%">Execute Move</button>
+                    </div>
+                    <div class="card"><div class="card-title">📊 Yard Population by Block</div><div id="yardBlockTable" style="display:flex;flex-direction:column;gap:0.35rem"></div></div>
+                </div>
+            </div>
+
+            <!-- ─── SHIFTING ─── -->
+            <div class="tab-pane" id="tab-shifting">
+                <div class="page-hdr">
+                    <div><h2>Container Shifting</h2><div class="sub">Track all containers shifted within the terminal — full accountability</div></div>
+                    <button class="btn btn-sm btn-secondary" onclick="exportShiftingCSV()">📥 Export Shifts</button>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title">🔀 Record Shift</div>
+                        <div class="section-tag">Move container from one yard position to another. From-yard is auto-filled from container record.</div>
+                        <div class="form-group mb-2">
+                            <label>Container ID *</label>
+                            <select id="sh-id" onchange="shiftAutofill()"><option value="">— Select Container —</option></select>
+                        </div>
+                        <div id="sh-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
+                        <div class="form-group mb-2"><label>From Yard / Block (auto-filled)</label><input id="sh-from" readonly style="background:rgba(10,18,35,0.4);cursor:not-allowed"></div>
+                        <div class="form-group mb-2">
+                            <label>To Yard / Block *</label>
+                            <select id="sh-to">
+                                <option value="">— Select New Position —</option>
+                                <option>BLOCK-A-01</option>
+                                <option>BLOCK-A-02</option>
+                                <option>BLOCK-A-03</option>
+                                <option>BLOCK-B-01</option>
+                                <option>BLOCK-B-02</option>
+                                <option>BLOCK-B-03</option>
+                                <option>BLOCK-C-01</option>
+                                <option>BLOCK-C-02</option>
+                                <option>BLOCK-C-03</option>
+                                <option>BLOCK-D-01</option>
+                                <option>BLOCK-D-02</option>
+                                <option>G2203</option>
+                                <option>G2204</option>
+                                <option>G2205</option>
+                                <option>SGR-YARD</option>
+                                <option>HOLDING-AREA</option>
+                                <option>KEY-SITE</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label>Reason for Shift *</label>
+                            <select id="sh-reason"><option value="Crane Ops">Crane Operations</option><option value="Vessel Planning">Vessel Planning</option><option value="Yard Optimization">Yard Optimization</option><option value="Key Site Prep">Key Site Preparation</option><option value="Reefer Bay">Reefer Bay Allocation</option><option value="Customer Request">Customer Request</option><option value="Inspection">Customs/Inspection</option><option value="Other">Other</option></select>
+                        </div>
+                        <div class="form-group mb-2"><label>Equipment Used</label><input id="sh-equip" placeholder="e.g. RTG-02, Forklift-01"></div>
+                        <div class="form-group mb-2"><label>Shift Clerk</label><input id="sh-clerk" placeholder="Clerk / operator name"></div>
+                        <div class="form-group mb-2"><label>Remarks</label><input id="sh-remark" placeholder="Additional notes"></div>
+                        <button class="btn btn-primary" onclick="recordShift()" style="width:100%">🔀 Record Shift</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">📊 Shifting Summary</div>
+                        <div id="shiftSummary" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:1rem"></div>
+                        <div class="divider"></div>
+                        <div class="card-title">Top Shifted Containers</div>
+                        <div id="topShifted" style="display:flex;flex-direction:column;gap:0.3rem"></div>
+                    </div>
+                </div>
+                <div class="card mt-3">
+                    <div class="card-title">📋 All Shift Records</div>
+                    <div class="flex gap-2 mb-2"><input id="shiftSearch" placeholder="🔍 Search container / yard / clerk..." style="max-width:280px" oninput="renderShifting()"></div>
+                    <div class="table-wrap"><table><thead><tr><th>Container ID</th><th>Line</th><th>Vessel</th><th>From</th><th>To</th><th>Reason</th><th>Equipment</th><th>Clerk</th><th>Shift Count</th><th>Shifted At</th></tr></thead><tbody id="shiftBody"></tbody></table></div>
+                    <div class="mt-2 text-xs text-muted" id="shiftCount"></div>
+                </div>
+            </div>
+
+            <!-- ─── KEY SITE / PRE-STAKE ─── -->
+            <div class="tab-pane" id="tab-keysite">
+                <div class="page-hdr">
+                    <div><h2>Pre-Stake / Key Site</h2><div class="sub">Containers staged at key site ready for vessel loading or direct-to-vessel movement</div></div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-secondary" onclick="exportKeysiteCSV()">📥 Export CSV</button>
+                        <button class="btn btn-sm btn-secondary" onclick="exportKeysitePDF()">📄 PDF Report</button>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-title">⚓ Pre-Stake Process Flow</div>
+                    <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;padding:0.75rem;background:rgba(6,14,32,0.5);border-radius:10px">
+                        <div class="wf-step wf-done">📋 Pre-Advised</div><span class="wf-arrow">→</span>
+                        <div class="wf-step wf-done">✅ Gated In / Discharged</div><span class="wf-arrow">→</span>
+                        <div class="wf-step wf-done">📍 Yard Block</div><span class="wf-arrow">→</span>
+                        <div class="wf-step wf-active">⚓ KEY SITE (Pre-Stake)</div><span class="wf-arrow">→</span>
+                        <div class="wf-step wf-pending">🛳️ Vessel Load / Direct</div>
+                    </div>
+                </div>
+                <div class="grid-2 mb-3">
+                    <div class="card">
+                        <div class="card-title">⚓ Move to Key Site (Pre-Stake)</div>
+                        <div class="section-tag">Move a gated-in or yard-received container to the Key Site staging area for vessel loading.</div>
+                        <div class="form-group mb-2">
+                            <label>Container ID *</label>
+                            <select id="ks-move-id" onchange="keysiteMoveAutofill()"><option value="">— Select Eligible Container —</option></select>
+                        </div>
+                        <div id="ks-move-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
+                        <div class="form-group mb-2"><label>Key Site Bay / Slot</label><input id="ks-bay" placeholder="e.g. KS-A01, BERTH-2-SLOT-04"></div>
+                        <div class="form-group mb-2"><label>Vessel (confirm) *</label><input id="ks-vessel" placeholder="Target vessel name" oninput="this.value=this.value.toUpperCase()"></div>
+                        <div class="form-group mb-2"><label>Voyage</label><input id="ks-voyage" placeholder="Voyage number"></div>
+                        <div class="form-group mb-2"><label>Equipment Used</label><input id="ks-equip" placeholder="e.g. RTG-04, Forklift-02"></div>
+                        <div class="form-group mb-2"><label>Pre-Stake Clerk *</label><input id="ks-clerk" placeholder="Clerk / TT Operator"></div>
+                        <div class="form-group mb-2"><label>Remarks</label><input id="ks-remark" placeholder="Additional notes"></div>
+                        <button class="btn btn-primary" onclick="moveToKeysite()" style="width:100%;margin-top:0.5rem">⚓ Execute Pre-Stake to Key Site</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🛳️ Direct to Vessel from Key Site</div>
+                        <div class="section-tag">Load a container from Key Site directly onto the vessel — final step of the pre-stake process.</div>
+                        <div class="form-group mb-2">
+                            <label>Container ID (at Key Site) *</label>
+                            <select id="ks-load-id" onchange="keysiteLoadAutofill()"><option value="">— Select Key Site Container —</option></select>
+                        </div>
+                        <div id="ks-load-autofill" class="hidden mb-2 text-sm" style="background:rgba(52,211,153,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(52,211,153,0.16)"></div>
+                        <div class="form-group mb-2"><label>Actual Vessel Loaded (leave blank if same as designated)</label><input id="ks-load-actual-vessel" placeholder="Designated vessel auto-used if blank" oninput="checkRandomLoadUI('ks-load')"></div>
+                        <div class="form-group mb-2"><label>Actual Voyage</label><input id="ks-load-actual-voyage" placeholder="Voyage (if different)"></div>
+                        <div id="ks-load-random-block" class="hidden mb-2" style="background:rgba(251,146,60,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(251,146,60,0.2)">
+                            <div class="text-xs" style="color:var(--orange);font-weight:700;margin-bottom:0.5rem">🎲 RANDOM LOADING DETECTED — actual vessel differs from designated. A reason is required.</div>
+                            <div class="form-group">
+                                <label>Random Loading Reason *</label>
+                                <select id="ks-load-random-reason">
+                                    <option value="">— Select Reason —</option>
+                                    <option value="Vessel Planning">Vessel Planning</option>
+                                    <option value="Yard Management">Yard Management</option>
+                                    <option value="Shutout Replacement">Shutout Replacement</option>
+                                    <option value="Space Optimization">Space Optimization</option>
+                                    <option value="Documentation Correction">Documentation Correction</option>
+                                    <option value="Line Instruction">Shipping Line Instruction</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group mb-2"><label>Loading Clerk *</label><input id="ks-load-clerk" placeholder="Loading clerk full name"></div>
+                        <div class="form-group mb-2"><label>Bay / Position</label><input id="ks-load-bay" placeholder="e.g. BAY-04-T02"></div>
+                        <div class="form-group mb-2"><label>Crane / Equipment</label><input id="ks-load-crane" placeholder="e.g. QC-03, Quay Crane 3"></div>
+                        <div class="form-group mb-2"><label>Remarks</label><input id="ks-load-remark" placeholder="Optional remarks"></div>
+                        <button class="btn btn-success" onclick="loadFromKeysite2()" style="width:100%;margin-top:0.5rem">🛳️ Confirm Load to Vessel</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
+                        <div class="card-title" style="margin:0">⚓ Key Site Population — <span id="keysiteCount" style="color:var(--accent)">0 containers</span></div>
+                        <div class="flex gap-2">
+                            <input id="ksSearch" placeholder="🔍 Search..." style="max-width:200px;height:32px;font-size:0.78rem" oninput="renderKeysite()">
+                        </div>
+                    </div>
+                    <div class="table-wrap"><table><thead><tr><th>Container ID</th><th>Line</th><th>Type</th><th>Vessel</th><th>Voyage</th><th>KS Bay</th><th>Source</th><th>Entry</th><th>Dwell</th><th>Shifts</th><th>Pre-Stake Clerk</th><th>Action</th></tr></thead><tbody id="keysiteBody"></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- ─── VESSEL LOADING ─── -->
+            <div class="tab-pane" id="tab-vessel">
+                <div class="page-hdr"><div><h2>Vessel Loading</h2><div class="sub">Link containers to vessel with full loading clerk accountability</div></div></div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title">🛳️ Load Container to Vessel</div>
+                        <div class="form-group mb-2">
+                            <label>Container ID *</label>
+                            <select id="v-id" onchange="vesselAutofill()"><option value="">— Select Container —</option></select>
+                        </div>
+                        <div id="v-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
+                        <div class="form-group mb-2"><label>Actual Vessel Loaded (leave blank if same as designated)</label><input id="v-actual-vessel" placeholder="Designated vessel auto-used if blank" oninput="checkRandomLoadUI('v')"></div>
+                        <div class="form-group mb-2"><label>Actual Voyage</label><input id="v-actual-voyage" placeholder="Voyage (if different)"></div>
+                        <div id="v-random-block" class="hidden mb-2" style="background:rgba(251,146,60,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(251,146,60,0.2)">
+                            <div class="text-xs" style="color:var(--orange);font-weight:700;margin-bottom:0.5rem">🎲 RANDOM LOADING DETECTED — actual vessel differs from designated. A reason is required.</div>
+                            <div class="form-group">
+                                <label>Random Loading Reason *</label>
+                                <select id="v-random-reason">
+                                    <option value="">— Select Reason —</option>
+                                    <option value="Vessel Planning">Vessel Planning</option>
+                                    <option value="Yard Management">Yard Management</option>
+                                    <option value="Shutout Replacement">Shutout Replacement</option>
+                                    <option value="Space Optimization">Space Optimization</option>
+                                    <option value="Documentation Correction">Documentation Correction</option>
+                                    <option value="Line Instruction">Shipping Line Instruction</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group mb-2"><label>Loading Clerk *</label><input id="v-clerk" placeholder="Full name of loading clerk"></div>
+                        <div class="form-group mb-2"><label>Bay / Position</label><input id="v-bay" placeholder="e.g. BAY-04-T02"></div>
+                        <div class="form-group mb-2"><label>Remarks</label><input id="v-remark" placeholder="Optional remarks"></div>
+                        <button class="btn btn-primary" onclick="loadVessel()" style="width:100%">⚓ Confirm Load to Vessel</button>
+                    </div>
+                    <div class="card"><div class="card-title">📊 Loaded per Vessel</div><div id="vesselLoadedTable" style="display:flex;flex-direction:column;gap:0.35rem"></div></div>
+                </div>
+                <div class="card mt-3">
+                    <div class="card-title">📋 All Loaded Containers</div>
+                    <div class="table-wrap"><table><thead><tr><th>Container ID</th><th>Line</th><th>Type</th><th>Vessel</th><th>Voyage</th><th>Bay</th><th>Loading Clerk</th><th>Shifts</th><th>Loaded At</th></tr></thead><tbody id="vesselBody"></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- ─── SHUTOUTS ─── -->
+            <div class="tab-pane" id="tab-shutouts">
+                <div class="page-hdr">
+                    <div><h2>Shutouts</h2><div class="sub">Containers planned for loading but not loaded — missed vessel records</div></div>
+                    <button class="btn btn-sm btn-secondary" onclick="exportShutoutsCSV()">📥 Export Shutouts</button>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title">🚫 Record Shutout</div>
+                        <div class="section-tag">Container was at Key Site / ready for load but was NOT loaded onto the vessel.</div>
+                        <div class="form-group mb-2">
+                            <label>Container ID *</label>
+                            <select id="so-id" onchange="shutoutAutofill()"><option value="">— Select Container (Key Site / Gated In) —</option></select>
+                        </div>
+                        <div id="so-autofill" class="hidden mb-2 text-sm" style="background:rgba(251,113,133,0.05);padding:0.75rem;border-radius:9px;border:1px solid rgba(251,113,133,0.18)"></div>
+                        <div class="form-group mb-2"><label>Vessel (Missed)</label><input id="so-vessel" readonly style="background:rgba(10,18,35,0.4)"></div>
+                        <div class="form-group mb-2"><label>Voyage</label><input id="so-voyage" readonly style="background:rgba(10,18,35,0.4)"></div>
+                        <div class="form-group mb-2">
+                            <label>Shutout Reason *</label>
+                            <select id="so-reason">
+                                <option value="Weight Discrepancy">Weight Discrepancy</option>
+                                <option value="Vessel Cutoff Missed">Vessel Cutoff Missed</option>
+                                <option value="Documentation Incomplete">Documentation Incomplete</option>
+                                <option value="Port Congestion">Port Congestion</option>
+                                <option value="Vessel Full">Vessel Full (No Space)</option>
+                                <option value="Equipment Failure">Equipment Failure</option>
+                                <option value="Reefer Fault">Reefer Fault</option>
+                                <option value="Customs Hold">Customs Hold</option>
+                                <option value="Line Decision">Shipping Line Decision</option>
+                                <option value="VGM Discrepancy">VGM Discrepancy</option>
+                                <option value="Hazmat Issue">Hazardous Material Issue</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-2"><label>Responsible Clerk</label><input id="so-clerk" placeholder="Clerk / officer name"></div>
+                        <div class="form-group mb-2">
+                            <label>Next Action</label>
+                            <select id="so-action"><option value="Return to Yard">Return to Yard</option><option value="Key Site Hold">Hold at Key Site</option><option value="Next Vessel">Book on Next Vessel</option><option value="Return to Depot">Return to Depot</option></select>
+                        </div>
+                        <div class="form-group mb-2"><label>Remarks</label><input id="so-remark" placeholder="Additional details"></div>
+                        <button class="btn btn-danger" onclick="recordShutout()" style="width:100%">🚫 Record Shutout</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">📊 Shutout Summary</div>
+                        <div id="shutoutSummary" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:1rem"></div>
+                        <div class="divider"></div>
+                        <div class="card-title">By Reason</div>
+                        <div id="shutoutByReason" style="display:flex;flex-direction:column;gap:0.3rem"></div>
+                    </div>
+                </div>
+                <div class="card mt-3">
+                    <div class="card-title">📋 All Shutout Records</div>
+                    <div class="table-wrap"><table><thead><tr><th>Container ID</th><th>Line</th><th>Vessel (Missed)</th><th>Voyage</th><th>Entry Point</th><th>Reason</th><th>Next Action</th><th>Clerk</th><th>Shutout At</th><th>Status</th></tr></thead><tbody id="shutoutBody"></tbody></table></div>
+                    <div class="mt-2 text-xs text-muted" id="shutoutCount"></div>
+                </div>
+            </div>
+
+            <!-- ─── RANDOM LOADING ─── -->
+            <div class="tab-pane" id="tab-random-loading">
+                <div class="page-hdr">
+                    <div><h2>Random Loading</h2><div class="sub">Containers loaded onto a vessel other than their designated vessel — full traceability &amp; accountability</div></div>
+                    <button class="btn btn-sm btn-secondary" onclick="exportRandomLoadingCSV()">📥 Export CSV</button>
+                </div>
+                <div class="card mb-3">
+                    <div class="section-tag">🎲 Random loading happens when a container is loaded onto a vessel/voyage different from what it was designated for — due to vessel planning, yard management, shutout replacement, or other operational reasons. These are captured automatically wherever containers are loaded (Vessel Loading, Key Site direct load, Yard direct-to-vessel), and are fully searchable and reportable here.</div>
+                </div>
+                <div class="grid-2 mb-3">
+                    <div class="card">
+                        <div class="card-title">📊 Random Loading Summary</div>
+                        <div id="randomSummary" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:1rem"></div>
+                        <div class="divider"></div>
+                        <div class="card-title">By Reason</div>
+                        <div id="randomByReason" style="display:flex;flex-direction:column;gap:0.3rem"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🎲 Manually Flag / Correct a Loaded Container</div>
+                        <div class="section-tag">Use this only to retroactively flag or correct a container that was already loaded but whose random-load status wasn't captured at load time.</div>
+                        <div class="form-group mb-2">
+                            <label>Container ID (Loaded) *</label>
+                            <select id="rl-id" onchange="randomLoadAutofill()"><option value="">— Select Loaded Container —</option></select>
+                        </div>
+                        <div id="rl-autofill" class="hidden mb-2 text-sm" style="background:rgba(167,139,250,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(167,139,250,0.2)"></div>
+                        <div class="form-group mb-2"><label>Actual Vessel Loaded *</label><input id="rl-actual-vessel" placeholder="Vessel actually loaded onto" oninput="this.value=this.value.toUpperCase()"></div>
+                        <div class="form-group mb-2"><label>Actual Voyage</label><input id="rl-actual-voyage" placeholder="Voyage number"></div>
+                        <div class="form-group mb-2">
+                            <label>Reason *</label>
+                            <select id="rl-reason">
+                                <option value="">— Select Reason —</option>
+                                <option value="Vessel Planning">Vessel Planning</option>
+                                <option value="Yard Management">Yard Management</option>
+                                <option value="Shutout Replacement">Shutout Replacement</option>
+                                <option value="Space Optimization">Space Optimization (No room on designated vessel)</option>
+                                <option value="Documentation Correction">Documentation Correction</option>
+                                <option value="Line Instruction">Shipping Line Instruction</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-2"><label>Clerk *</label><input id="rl-clerk" placeholder="Clerk / officer name"></div>
+                        <div class="form-group mb-2"><label>Remarks</label><input id="rl-remark" placeholder="Additional details"></div>
+                        <button class="btn btn-gold" onclick="recordRandomLoadManual()" style="width:100%">🎲 Record Random Load</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
+                        <div class="card-title" style="margin:0">🎲 All Random Loading Records — <span id="randomCount" style="color:var(--violet)">0 records</span></div>
+                        <input id="randomSearch" placeholder="🔍 Search container / vessel / reason..." style="max-width:260px" oninput="renderRandomLoading()">
+                    </div>
+                    <div class="table-wrap"><table><thead><tr><th>Record</th><th>Container ID</th><th>Line</th><th>Designated Vessel</th><th>Actual Vessel</th><th>Reason</th><th>Clerk</th><th>Recorded At</th></tr></thead><tbody id="randomBody"></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- ─── SGR ─── -->
+            <div class="tab-pane" id="tab-sgr">
+                <div class="page-hdr"><div><h2>SGR (ICD) Workflow</h2><div class="sub">Inland Container Depot → SGR train → KPA Port terminal operations</div></div></div>
+                <div class="card mb-2">
+                    <div class="card-title">🚃 SGR Workflow</div>
+                    <div class="workflow">
+                        <span class="wf-step wf-done">📋 Pre-Advised (ICD)</span><span class="wf-arrow">→</span>
+                        <span class="wf-step wf-active">🚋 Loaded on Wagon</span><span class="wf-arrow">→</span>
+                        <span class="wf-step wf-pending">🏁 Received at SGR</span><span class="wf-arrow">→</span>
+                        <span class="wf-step wf-pending">📍 Yard / Pre-Stake</span><span class="wf-arrow">→</span>
+                        <span class="wf-step wf-pending">🛳️ Vessel / Out</span>
+                    </div>
+                    <div class="text-xs text-muted" style="margin-top:0.5rem">⏱️ Free period: 7 days from arrival at SGR port</div>
+                </div>
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-title">🚋 Load on Wagon</div>
+                        <div class="form-group mb-2">
+                            <label>Container ID (ICD pre-advised)</label>
+                            <select id="sgr-load"><option value="">— Select ICD Container —</option></select>
+                        </div>
+                        <div class="form-group mb-2"><label>Wagon Number</label><input id="sgr-wagon" placeholder="Wagon No."></div>
+                        <button class="btn btn-primary btn-sm" onclick="sgrLoadWagon()" style="width:100%">🚋 Load on Wagon</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🏁 Receive at SGR Port</div>
+                        <div class="form-group mb-2">
+                            <label>Container ID (on wagon)</label>
+                            <select id="sgr-recv"><option value="">— Select On-Wagon Container —</option></select>
+                        </div>
+                        <div class="form-group mb-2"><label>SGR Receiving Yard</label><select id="sgr-yard"><option>SGR-YARD</option><option>BLOCK-A-01</option><option>BLOCK-B-01</option></select></div>
+                        <button class="btn btn-primary btn-sm" onclick="sgrReceive()" style="width:100%">🏁 Receive at SGR</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🚪 Move Out of Port</div>
+                        <div class="form-group mb-2">
+                            <label>Container ID</label>
+                            <select id="sgr-out"><option value="">— Select Container —</option></select>
+                        </div>
+                        <div class="form-group mb-2"><label>Reason</label><input id="sgr-out-reason" placeholder="e.g. Returned to ICD"></div>
+                        <button class="btn btn-gold btn-sm" onclick="sgrOut()" style="width:100%">🚪 Move Out</button>
+                    </div>
+                </div>
+                <div class="card mt-2">
+                    <div class="card-title">📊 SGR Population</div>
+                    <div id="sgrPop" class="text-sm" style="line-height:2.2"></div>
+                    <div class="divider"></div>
+                    <div class="table-wrap"><table><thead><tr><th>Container ID</th><th>Line</th><th>Type</th><th>Status</th><th>Wagon</th><th>Yard</th><th>Dwell</th><th>Free Days Left</th></tr></thead><tbody id="sgrBody"></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- ─── IMPORTS / FULL ─── -->
+            <div class="tab-pane" id="tab-imports-full">
+                <div class="page-hdr">
+                    <div><h2>Imports / Full Containers</h2><div class="sub">Vessel Discharge → Tag Master → Yard → RTG Offload → Release &amp; Gate Out</div></div>
+                    <div class="btn-group"><button class="btn btn-sm btn-primary" onclick="seedImportContainers()">🌊 Seed Demo</button></div>
+                </div>
+                <div class="stat-grid" id="importStatsGrid"></div>
+                <div class="card mb-3">
+                    <div class="card-title">📦 Import Workflow</div>
+                    <div class="workflow">
+                        <span class="wf-step wf-done">⛴️ Vessel Discharge</span><span class="wf-arrow">→</span>
+                        <span class="wf-step wf-active">🚛 Tag Master / TT</span><span class="wf-arrow">→</span>
+                        <span class="wf-step wf-pending">📍 Yard Receive</span><span class="wf-arrow">→</span>
+                        <span class="wf-step wf-pending">🏗️ RTG Offload</span><span class="wf-arrow">→</span>
+                        <span class="wf-step wf-pending">🚪 Gate Out (Release)</span>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-title">📤 Bulk Upload Import Containers (CSV)</div>
+                    <div class="section-tag">CSV: Container ID, Shipping Line, Vessel, Type, Voyage</div>
+                    <div class="drop-zone" id="importBulkDZ" onclick="document.getElementById('importBulkFile').click()">
+                        <div class="dz-icon">📁</div><div class="dz-title">Drag &amp; drop CSV or click to browse</div><div class="dz-sub">Containers created with status: Vessel Discharged</div>
+                        <input type="file" id="importBulkFile" accept=".csv" class="hidden" onchange="handleImportBulkFile(event)">
+                    </div>
+                    <div id="importBulkPreview" class="hidden mt-3">
+                        <div class="flex justify-between items-center mb-2 flex-wrap gap-2"><div class="card-title" style="margin:0">📋 Preview — <span id="importBulkCount">0</span> containers</div><div class="btn-group"><button class="btn btn-success btn-sm" onclick="commitImportBulk()">✅ Commit All Valid</button><button class="btn btn-danger btn-sm" onclick="clearImportBulk()">✕ Clear</button></div></div>
+                        <div class="scroll-table table-wrap"><table><thead><tr><th>#</th><th>Container ID</th><th>Line</th><th>Vessel</th><th>Type</th><th>Voyage</th><th>Valid</th></tr></thead><tbody id="importBulkBody"></tbody></table></div>
+                        <div id="importBulkErrors" class="mt-2 text-sm text-danger"></div>
+                    </div>
+                </div>
+                <div class="grid-2" style="gap:1.1rem;margin-bottom:1.2rem">
+                    <div class="card">
+                        <div class="card-title">⛴️ 1. DISCHARGE → TAG MASTER / TT</div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Container ID</label><select id="imp-tag-id"><option value="">— Select Discharged Container —</option></select></div>
+                            <div class="form-group"><label>TT / Tag ID</label><input id="imp-tag-tt" placeholder="TT-101"></div>
+                        </div>
+                        <button class="btn btn-primary btn-sm mt-2" onclick="moveToTagMaster()">🚛 Move to Tag Master</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🏁 2. TAG MASTER → YARD</div>
+                        <div class="form-group mb-2"><label>Container ID</label><select id="imp-yard-id"><option value="">— Select Tag Master Container —</option></select></div>
+                        <div class="form-group mb-2"><label>Yard Block / Row</label><input id="imp-yard-block" placeholder="e.g. YARD-C12"></div>
+                        <div class="form-group mb-2"><label>Receiving Clerk</label><input id="imp-receiving-clerk" placeholder="Full name"></div>
+                        <button class="btn btn-primary btn-sm mt-2" onclick="moveToYardReceive()">📌 Receive &amp; Stage</button>
+                    </div>
+                </div>
+                <div class="grid-2" style="gap:1.1rem;margin-bottom:1.2rem">
+                    <div class="card">
+                        <div class="card-title">🏗️ 3. RTG OFFLOAD</div>
+                        <div class="form-group mb-2"><label>Container ID</label><select id="imp-offload-id"><option value="">— Select Yard-Staged Container —</option></select></div>
+                        <div class="form-group mb-2"><label>RTG Operator / Crane ID</label><input id="imp-rtg-op" placeholder="RTG-03"></div>
+                        <div class="form-group mb-2"><label>TT Driver Name</label><input id="imp-driver-name" placeholder="Driver name"></div>
+                        <button class="btn btn-primary btn-sm mt-2" onclick="rtgOffload()">✅ Mark Offloaded (RTG)</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🚛 4. RELEASE CLERK – GATE OUT</div>
+                        <div class="form-group mb-2"><label>Container ID</label><select id="imp-release-id"><option value="">— Select Offloaded Container —</option></select></div>
+                        <div class="form-group mb-2"><label>Truck Plate *</label><input id="imp-truck-plate" placeholder="KCD 123X" oninput="this.value=this.value.toUpperCase()"></div>
+                        <div class="form-group mb-2"><label>Transport Company</label><input id="imp-transco" placeholder="Logistic Ltd"></div>
+                        <div class="form-group mb-2"><label>Destination / Consignee</label><input id="imp-dest" placeholder="Nairobi ICD"></div>
+                        <div class="form-group mb-2"><label>Release Clerk</label><input id="imp-release-clerk" placeholder="Release clerk"></div>
+                        <button class="btn btn-success mt-2" onclick="releaseContainerOut()">📄 Gate Out &amp; Release</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📋 Import / Full Container Inventory</div>
+                    <div class="flex gap-2 flex-wrap mb-2" style="align-items:flex-end">
+                        <div style="flex:1;min-width:180px"><input id="impSearch" placeholder="🔍 Search ID / Line / Vessel..." oninput="renderImportTable()"></div>
+                        <select id="impStatusFilter" onchange="renderImportTable()" style="max-width:180px"><option value="">All Status</option><option value="VESSEL_DISCHARGED">Vessel Discharged</option><option value="AT_TAG_MASTER">Tag Master</option><option value="RECEIVED_YARD">Yard Staged</option><option value="OFFLOADED_RTG">RTG Offloaded</option><option value="RELEASED_OUT">Released Out</option></select>
+                        <select id="impLineFilter" onchange="renderImportTable()" style="max-width:140px"><option value="">All Lines</option></select>
+                    </div>
+                    <div class="table-wrap"><table><thead><tr><th>Container ID</th><th>Line</th><th>Vessel</th><th>Type</th><th>Status</th><th>TT/Tag</th><th>Yard</th><th>Recv. Clerk</th><th>RTG Op.</th><th>Rel. Clerk</th><th>Truck</th><th>Free Days</th><th>Dwell (h)</th><th>Action</th></tr></thead><tbody id="importTbody"></tbody></table></div>
+                </div>
+                <div class="card mt-3">
+                    <div class="card-title">📊 Imports Analytics</div>
+                    <div class="grid-2" style="margin-bottom:1rem"><div style="height:200px"><canvas id="importStatusChart"></canvas></div><div style="height:200px"><canvas id="importLineChart"></canvas></div></div>
+                    <div class="grid-2"><div><div class="card-title text-sm">⏳ Dwell Distribution</div><canvas id="importDwellChart" height="150"></canvas></div><div><div class="card-title text-sm">🚛 Release Clerk Performance</div><div id="importReleaseStats"></div></div></div>
+                    <div class="flex gap-2 mt-2"><button class="btn btn-secondary btn-sm" onclick="exportImportCSV()">📥 Export CSV</button><button class="btn btn-secondary btn-sm" onclick="exportImportPDF()">📄 PDF Report</button></div>
+                </div>
+            </div>
+
+            <!-- ─── REPORTS & ANALYTICS ─── -->
+            <div class="tab-pane" id="tab-reports">
+                <div class="page-hdr">
+                    <div><h2>Reports &amp; Analytics</h2><div class="sub">Operational intelligence &amp; performance metrics · KPA MCT</div></div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-secondary" onclick="exportFullReportPDF()">📄 Full PDF Report</button>
+                        <button class="btn btn-sm btn-secondary" onclick="exportAllCSV()">📥 Full CSV Export</button>
+                    </div>
+                </div>
+                <div class="reports-filter-bar">
+                    <label>Filter Reports:</label>
+                    <select id="rpt-vessel" onchange="applyReportFilters()" style="max-width:180px"><option value="">All Vessels</option></select>
+                    <select id="rpt-line" onchange="applyReportFilters()" style="max-width:150px"><option value="">All Lines</option></select>
+                    <select id="rpt-source" onchange="applyReportFilters()" style="max-width:140px"><option value="">All Sources</option><option>Gate18</option><option>Gate24</option><option>ICD</option><option>Vessel</option></select>
+                    <select id="rpt-status" onchange="applyReportFilters()" style="max-width:160px"><option value="">All Statuses</option><option>PREADVISED</option><option>GATED_IN</option><option>KEY_SITE</option><option>LOADED_VESSEL</option><option>SHUTOUT</option></select>
+                    <button class="btn btn-sm btn-secondary" onclick="clearReportFilters()">✕ Clear Filters</button>
+                </div>
+                <div class="report-tabs">
+                    <div class="rtab active" onclick="switchReportTab('overview',event)">📊 Overview</div>
+                    <div class="rtab" onclick="switchReportTab('containers',event)">📦 Containers</div>
+                    <div class="rtab" onclick="switchReportTab('vessels',event)">🛳️ Vessels</div>
+                    <div class="rtab" onclick="switchReportTab('performance',event)">👤 Performance</div>
+                    <div class="rtab" onclick="switchReportTab('dwell',event)">⏳ Dwell &amp; Freetime</div>
+                    <div class="rtab" onclick="switchReportTab('shutouts',event)">🚫 Shutouts</div>
+                    <div class="rtab" onclick="switchReportTab('random',event)">🎲 Random Loading</div>
+                    <div class="rtab" onclick="switchReportTab('sgr',event)">🚃 SGR / ICD</div>
+                    <div class="rtab" onclick="switchReportTab('imports',event)">📥 Imports</div>
+                </div>
+                <div class="report-section active" id="rsec-overview">
+                    <div class="report-kpi-row" id="rpt-kpi-row"></div>
+                    <div class="res-grid">
+                        <div class="card"><div class="card-title">📦 Population by Status</div><div class="chart-wrap"><canvas id="chartStatus"></canvas></div><div id="popStatusTable" class="mt-2"></div></div>
+                        <div class="card"><div class="card-title">🚢 Per Shipping Line</div><div class="chart-wrap"><canvas id="chartLine"></canvas></div><div id="lineTable" class="mt-2"></div></div>
+                        <div class="card"><div class="card-title">🏗️ By Entry Point</div><div class="chart-wrap"><canvas id="chartSource"></canvas></div><div id="sourceTable" class="mt-2"></div></div>
+                    </div>
+                </div>
+                <div class="report-section" id="rsec-containers">
+                    <div class="card mb-3">
+                        <div class="card-title">📦 Container Detail Report</div>
+                        <div class="report-table-wrap"><table class="report-table"><thead><tr><th>Container ID</th><th>Line</th><th>Vessel</th><th>Type</th><th>Source</th><th>Status</th><th>Yard</th><th>Dwell (h)</th><th>Free Days</th><th>Shifts</th><th>Slip No.</th></tr></thead><tbody id="rpt-container-tbody"></tbody></table></div>
+                    </div>
+                </div>
+                <div class="report-section" id="rsec-vessels">
+                    <div class="res-grid">
+                        <div class="card"><div class="card-title">🛳️ Gated per Vessel</div><div class="chart-wrap"><canvas id="chartGatedVessel"></canvas></div><div id="gatedVesselTable" class="mt-2"></div></div>
+                        <div class="card"><div class="card-title">🛳️ Loaded per Vessel</div><div class="chart-wrap"><canvas id="chartLoaded"></canvas></div><div id="loadedTable" class="mt-2"></div></div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-title">🛳️ Vessel Performance Table</div>
+                        <div class="report-table-wrap"><table class="report-table"><thead><tr><th>Vessel</th><th>Gated In</th><th>Key Site</th><th>Loaded</th><th>Shutouts</th><th>Load Rate</th></tr></thead><tbody id="rpt-vessel-tbody"></tbody></table></div>
+                    </div>
+                </div>
+                <div class="report-section" id="rsec-performance">
+                    <div class="res-grid">
+                        <div class="card"><div class="card-title">👤 Loading Clerk Performance</div><div id="clerkTable" class="text-sm" style="display:flex;flex-direction:column;gap:0.35rem;margin-top:0.4rem"></div></div>
+                        <div class="card"><div class="card-title">🔀 Shifts per Container</div><div id="shiftChart" class="text-sm" style="display:flex;flex-direction:column;gap:0.35rem;margin-top:0.4rem"></div></div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-title">📊 Gate Clerk Activity</div>
+                        <div class="report-table-wrap"><table class="report-table"><thead><tr><th>Clerk</th><th>Gate-Ins</th><th>Gate</th><th>Last Activity</th></tr></thead><tbody id="rpt-clerk-tbody"></tbody></table></div>
+                    </div>
+                </div>
+                <div class="report-section" id="rsec-dwell">
+                    <div class="res-grid">
+                        <div class="card"><div class="card-title">⏳ Dwell Distribution</div><div class="chart-wrap"><canvas id="chartDwell"></canvas></div><div id="dwellTable" class="mt-2"></div></div>
+                        <div class="card"><div class="card-title">🏗️ Gated per Yard/Block</div><div class="chart-wrap"><canvas id="chartYard"></canvas></div><div id="yardTable" class="mt-2"></div></div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-title">🔴 Overdue Free Time — Detail Report</div>
+                        <div class="report-table-wrap"><table class="report-table"><thead><tr><th>Container ID</th><th>Line</th><th>Vessel</th><th>Source</th><th>Status</th><th>Yard</th><th>Free Period</th><th>Dwell (h)</th><th>Overdue (h)</th></tr></thead><tbody id="rpt-overdue-tbody"></tbody></table></div>
+                    </div>
+                </div>
+                <div class="report-section" id="rsec-shutouts">
+                    <div class="res-grid">
+                        <div class="card"><div class="card-title">🚫 Shutouts by Reason</div><div class="chart-wrap"><canvas id="chartShutout"></canvas></div><div id="shutoutChartTable" class="mt-2"></div></div>
+                        <div class="card"><div class="card-title">📊 Shutout Stats</div><div id="shutoutStatsRpt" style="display:flex;flex-direction:column;gap:0.35rem"></div></div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-title">📋 Shutout Detail Report</div>
+                        <div class="report-table-wrap"><table class="report-table"><thead><tr><th>Container ID</th><th>Line</th><th>Vessel</th><th>Voyage</th><th>Reason</th><th>Clerk</th><th>Next Action</th><th>Shutout At</th></tr></thead><tbody id="rpt-shutout-tbody"></tbody></table></div>
+                    </div>
+                </div>
+                <div class="report-section" id="rsec-random">
+                    <div class="res-grid">
+                        <div class="card"><div class="card-title">🎲 Random Loads by Reason</div><div class="chart-wrap"><canvas id="chartRandom"></canvas></div></div>
+                        <div class="card"><div class="card-title">📊 Random Loading Stats</div><div id="randomStatsRpt" style="display:flex;flex-direction:column;gap:0.35rem"></div></div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-title">📋 Random Loading Detail Report</div>
+                        <div class="report-table-wrap"><table class="report-table"><thead><tr><th>Container ID</th><th>Line</th><th>Designated Vessel</th><th>Actual Vessel</th><th>Reason</th><th>Clerk</th><th>Recorded At</th></tr></thead><tbody id="rpt-random-tbody"></tbody></table></div>
+                    </div>
+                </div>
+                <div class="report-section" id="rsec-sgr">
+                    <div class="card"><div class="card-title">🚃 SGR / ICD Summary</div><div id="icdTable" class="text-sm" style="display:flex;flex-direction:column;gap:0.35rem;margin-top:0.4rem"></div></div>
+                    <div class="card mt-3">
+                        <div class="card-title">📋 SGR Detail Report</div>
+                        <div class="report-table-wrap"><table class="report-table"><thead><tr><th>Container ID</th><th>Line</th><th>Type</th><th>Status</th><th>Wagon</th><th>SGR Yard</th><th>Dwell (h)</th><th>Free Days Left</th></tr></thead><tbody id="rpt-sgr-tbody"></tbody></table></div>
+                    </div>
+                </div>
+                <div class="report-section" id="rsec-imports">
+                    <div class="res-grid">
+                        <div class="card"><div class="card-title">📥 Imports by Status</div><div class="chart-wrap"><canvas id="rptImportStatus"></canvas></div></div>
+                        <div class="card"><div class="card-title">🚢 Imports by Line</div><div class="chart-wrap"><canvas id="rptImportLine"></canvas></div></div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-title">📋 Imports Detail Report</div>
+                        <div class="report-table-wrap"><table class="report-table"><thead><tr><th>Container ID</th><th>Line</th><th>Vessel</th><th>Type</th><th>Status</th><th>Yard</th><th>Recv Clerk</th><th>RTG Op</th><th>Rel Clerk</th><th>Truck</th><th>Dwell (h)</th></tr></thead><tbody id="rpt-import-tbody"></tbody></table></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── AUDIT LOGS ─── -->
+            <div class="tab-pane" id="tab-logs">
+                <div class="page-hdr">
+                    <div><h2>Audit Logs</h2><div class="sub">Full event history — immutable record of all terminal operations</div></div>
+                    <div class="btn-group"><button class="btn btn-secondary btn-sm" onclick="exportLogsCSV()">📥 Export Logs</button><button class="btn btn-danger btn-sm" onclick="clearLogs()">🗑️ Clear Logs</button></div>
+                </div>
+                <div class="card"><div class="scroll-table" style="max-height:520px;background:rgba(6,11,22,0.5);border-radius:9px;padding:1rem" id="logsContent"></div></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MOBILE NAV -->
+    <nav class="mob-bar" id="mobBar">
+        <div class="mob-item active" data-tab="dashboard"><span class="mi">📊</span>Dashboard</div>
+        <div class="mob-item" data-tab="containers"><span class="mi">📦</span>Empties</div>
+        <div class="mob-item" data-tab="gate"><span class="mi">🚛</span>Gate</div>
+        <div class="mob-item" data-tab="keysite"><span class="mi">⚓</span>PreStake</div>
+        <div class="mob-item" data-tab="reports"><span class="mi">📈</span>Reports</div>
+    </nav>
+
+    <!-- CONTAINER DETAIL MODAL -->
+    <div class="modal-overlay hidden" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-hdr"><div class="modal-title" id="modalTitle">Container Detail</div><button class="btn btn-secondary btn-sm" onclick="closeModal()">✕ Close</button></div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- SLIP PRINT MODAL -->
+    <div class="modal-overlay hidden" id="slipModal" onclick="closeSlipModal(event)">
+        <div class="modal" style="max-width:680px" onclick="event.stopPropagation()">
+            <div class="modal-hdr">
+                <div class="modal-title">🏷️ KPA Position Slip</div>
+                <div class="btn-group">
+                    <button class="btn btn-primary btn-sm" onclick="printSlip()">🖨️ Print</button>
+                    <button class="btn btn-gold btn-sm" onclick="pdfSlip()">📄 Save PDF</button>
+                    <button class="btn btn-secondary btn-sm" onclick="closeSlipModal()">✕</button>
+                </div>
+            </div>
+            <div id="slipPrintContent"></div>
+        </div>
+    </div>
+
+    <!-- IMPORT DETAIL MODAL -->
+    <div class="modal-overlay hidden" id="importDetailModal" onclick="closeImportDetailModal(event)">
+        <div class="modal" style="max-width:640px" onclick="event.stopPropagation()">
+            <div class="modal-hdr"><div class="modal-title" id="importDetailTitle">Import Container</div><button class="btn btn-secondary btn-sm" onclick="closeImportDetailModal()">✕ Close</button></div>
+            <div id="importDetailBody"></div>
+        </div>
+    </div>
+
+    <div id="toastBox"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="script.js"></script>
+
+    <div class="container">
+        <div id="foot">
+            <footer>
+                <div class="marquee">
+                    <span>May 2026 &bull; Built by JD Systems &nbsp;&nbsp;&nbsp;</span>
+                    <span>May 2026 &bull; Built by JD Systems &nbsp;&nbsp;&nbsp;</span>
+                    <span>May 2026 &bull; Built by JD Systems &nbsp;&nbsp;&nbsp;</span>
+                    <span>May 2026 &bull; Built by JD Systems &nbsp;&nbsp;&nbsp;</span>
+                </div>
+            </footer>
+        </div>
+    </div>
+</body>
+</html>
