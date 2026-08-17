@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TMS ·  Container Terminal · v11</title>
+    <title>Terminal TMS · Container Terminal Operations</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
@@ -38,7 +38,7 @@
         <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sb-logo">
-                <div class="sb-logo-kpa"><div style="width:40px;height:40px;border-radius:10px;background:rgba(56,189,248,0.12);display:flex;align-items:center;justify-content:center;font-size:20px">⚓</div></div>
+                <div class="sb-logo-kpa"><div style="width:40px;height:40px;border-radius:10px;background:rgba(74,123,171,0.12);display:flex;align-items:center;justify-content:center;font-size:20px">⚓</div></div>
                 <div class="sb-brand">Terminal TMS</div>
                 <div class="sb-sub">Kenya Ports Authority · Terminal Control</div>
                 <div class="sb-pill"><span class="dot"></span> Live · Mombasa MCT</div>
@@ -236,7 +236,7 @@
                         <button class="btn btn-primary" onclick="createContainer()">➕ Save Pre-Advice</button>
                         <button class="btn btn-secondary" onclick="clearPAForm()">✕ Clear Form</button>
                     </div>
-                    <div id="pa-validation" class="mt-2 text-sm" style="color:#fb7185"></div>
+                    <div id="pa-validation" class="mt-2 text-sm" style="color:#b3524f"></div>
                 </div>
             </div>
 
@@ -271,7 +271,7 @@
                             <label>Container ID *</label>
                             <select id="g-id" onchange="gateAutofill()"><option value="">— Select Pre-Advised Container —</option></select>
                         </div>
-                        <div id="g-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
+                        <div id="g-autofill" class="hidden mb-2 text-sm" style="background:rgba(74,123,171,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(74,123,171,0.16)"></div>
                         <div class="form-group mb-2">
                             <label>Gate *</label>
                             <select id="g-gate"><option value="Gate18">Gate 18</option><option value="Gate24">Gate 24</option></select>
@@ -342,7 +342,7 @@
                             <label>Container ID *</label>
                             <select id="vy-id" onchange="vyAutofill()"><option value="">— Select Pre-Advised (Vessel) Container —</option></select>
                         </div>
-                        <div id="vy-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
+                        <div id="vy-autofill" class="hidden mb-2 text-sm" style="background:rgba(74,123,171,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(74,123,171,0.16)"></div>
                         <div class="form-group mb-2">
                             <label>Yard / Block *</label>
                             <select id="vy-yard">
@@ -380,7 +380,7 @@
                             <label>Container ID *</label>
                             <select id="y-id" onchange="yardAutofill()"><option value="">— Select Container —</option></select>
                         </div>
-                        <div id="y-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
+                        <div id="y-autofill" class="hidden mb-2 text-sm" style="background:rgba(74,123,171,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(74,123,171,0.16)"></div>
                         <div class="form-group mb-2">
                             <label>Action</label>
                             <select id="y-action" onchange="toggleYardVesselFields()">
@@ -394,7 +394,7 @@
                             <div class="form-group mb-2"><label>Actual Voyage</label><input id="y-actual-voyage" placeholder="Voyage (if different)"></div>
                             <div class="form-group mb-2"><label>Loading Clerk</label><input id="y-clerk" placeholder="Clerk name"></div>
                         </div>
-                        <div id="y-random-block" class="hidden mb-2" style="background:rgba(251,146,60,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(251,146,60,0.2)">
+                        <div id="y-random-block" class="hidden mb-2" style="background:rgba(185,112,46,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(185,112,46,0.2)">
                             <div class="text-xs" style="color:var(--orange);font-weight:700;margin-bottom:0.5rem">🎲 RANDOM LOADING DETECTED — actual vessel differs from designated. A reason is required.</div>
                             <div class="form-group">
                                 <label>Random Loading Reason *</label>
@@ -431,7 +431,7 @@
                             <label>Container ID *</label>
                             <select id="sh-id" onchange="shiftAutofill()"><option value="">— Select Container —</option></select>
                         </div>
-                        <div id="sh-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
+                        <div id="sh-autofill" class="hidden mb-2 text-sm" style="background:rgba(74,123,171,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(74,123,171,0.16)"></div>
                         <div class="form-group mb-2"><label>From Yard / Block (auto-filled)</label><input id="sh-from" readonly style="background:rgba(10,18,35,0.4);cursor:not-allowed"></div>
                         <div class="form-group mb-2">
                             <label>To Yard / Block *</label>
@@ -508,7 +508,7 @@
                             <label>Container ID *</label>
                             <select id="ks-move-id" onchange="keysiteMoveAutofill()"><option value="">— Select Eligible Container —</option></select>
                         </div>
-                        <div id="ks-move-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
+                        <div id="ks-move-autofill" class="hidden mb-2 text-sm" style="background:rgba(74,123,171,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(74,123,171,0.16)"></div>
                         <div class="form-group mb-2"><label>Key Site Bay / Slot</label><input id="ks-bay" placeholder="e.g. KS-A01, BERTH-2-SLOT-04"></div>
                         <div class="form-group mb-2"><label>Vessel (confirm) *</label><input id="ks-vessel" placeholder="Target vessel name" oninput="this.value=this.value.toUpperCase()"></div>
                         <div class="form-group mb-2"><label>Voyage</label><input id="ks-voyage" placeholder="Voyage number"></div>
@@ -524,10 +524,10 @@
                             <label>Container ID (at Key Site) *</label>
                             <select id="ks-load-id" onchange="keysiteLoadAutofill()"><option value="">— Select Key Site Container —</option></select>
                         </div>
-                        <div id="ks-load-autofill" class="hidden mb-2 text-sm" style="background:rgba(52,211,153,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(52,211,153,0.16)"></div>
+                        <div id="ks-load-autofill" class="hidden mb-2 text-sm" style="background:rgba(47,158,99,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(47,158,99,0.16)"></div>
                         <div class="form-group mb-2"><label>Actual Vessel Loaded (leave blank if same as designated)</label><input id="ks-load-actual-vessel" placeholder="Designated vessel auto-used if blank" oninput="checkRandomLoadUI('ks-load')"></div>
                         <div class="form-group mb-2"><label>Actual Voyage</label><input id="ks-load-actual-voyage" placeholder="Voyage (if different)"></div>
-                        <div id="ks-load-random-block" class="hidden mb-2" style="background:rgba(251,146,60,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(251,146,60,0.2)">
+                        <div id="ks-load-random-block" class="hidden mb-2" style="background:rgba(185,112,46,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(185,112,46,0.2)">
                             <div class="text-xs" style="color:var(--orange);font-weight:700;margin-bottom:0.5rem">🎲 RANDOM LOADING DETECTED — actual vessel differs from designated. A reason is required.</div>
                             <div class="form-group">
                                 <label>Random Loading Reason *</label>
@@ -571,10 +571,10 @@
                             <label>Container ID *</label>
                             <select id="v-id" onchange="vesselAutofill()"><option value="">— Select Container —</option></select>
                         </div>
-                        <div id="v-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
+                        <div id="v-autofill" class="hidden mb-2 text-sm" style="background:rgba(74,123,171,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(74,123,171,0.16)"></div>
                         <div class="form-group mb-2"><label>Actual Vessel Loaded (leave blank if same as designated)</label><input id="v-actual-vessel" placeholder="Designated vessel auto-used if blank" oninput="checkRandomLoadUI('v')"></div>
                         <div class="form-group mb-2"><label>Actual Voyage</label><input id="v-actual-voyage" placeholder="Voyage (if different)"></div>
-                        <div id="v-random-block" class="hidden mb-2" style="background:rgba(251,146,60,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(251,146,60,0.2)">
+                        <div id="v-random-block" class="hidden mb-2" style="background:rgba(185,112,46,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(185,112,46,0.2)">
                             <div class="text-xs" style="color:var(--orange);font-weight:700;margin-bottom:0.5rem">🎲 RANDOM LOADING DETECTED — actual vessel differs from designated. A reason is required.</div>
                             <div class="form-group">
                                 <label>Random Loading Reason *</label>
@@ -617,7 +617,7 @@
                             <label>Container ID *</label>
                             <select id="so-id" onchange="shutoutAutofill()"><option value="">— Select Container (Key Site / Gated In) —</option></select>
                         </div>
-                        <div id="so-autofill" class="hidden mb-2 text-sm" style="background:rgba(251,113,133,0.05);padding:0.75rem;border-radius:9px;border:1px solid rgba(251,113,133,0.18)"></div>
+                        <div id="so-autofill" class="hidden mb-2 text-sm" style="background:rgba(179,82,79,0.05);padding:0.75rem;border-radius:9px;border:1px solid rgba(179,82,79,0.18)"></div>
                         <div class="form-group mb-2"><label>Vessel (Missed)</label><input id="so-vessel" readonly style="background:rgba(10,18,35,0.4)"></div>
                         <div class="form-group mb-2"><label>Voyage</label><input id="so-voyage" readonly style="background:rgba(10,18,35,0.4)"></div>
                         <div class="form-group mb-2">
@@ -684,7 +684,7 @@
                             <label>Container ID (Loaded) *</label>
                             <select id="rl-id" onchange="randomLoadAutofill()"><option value="">— Select Loaded Container —</option></select>
                         </div>
-                        <div id="rl-autofill" class="hidden mb-2 text-sm" style="background:rgba(167,139,250,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(167,139,250,0.2)"></div>
+                        <div id="rl-autofill" class="hidden mb-2 text-sm" style="background:rgba(124,141,181,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(124,141,181,0.2)"></div>
                         <div class="form-group mb-2"><label>Actual Vessel Loaded *</label><input id="rl-actual-vessel" placeholder="Vessel actually loaded onto" oninput="this.value=this.value.toUpperCase()"></div>
                         <div class="form-group mb-2"><label>Actual Voyage</label><input id="rl-actual-voyage" placeholder="Voyage number"></div>
                         <div class="form-group mb-2">
