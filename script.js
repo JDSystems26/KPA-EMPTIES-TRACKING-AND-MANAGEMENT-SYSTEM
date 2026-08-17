@@ -34,90 +34,161 @@ function tsAddOptions(id, opts) {
     }
 }
 
-// ═══ AUTH — Supabase Auth (email/password, looked up via username) ═══
+// ═══ AUTH ═══
+// Legacy local demo logins stay available as a fallback (useful offline / for quick demos).
+// Any username containing '@' is treated as a real Supabase Auth account instead.
+const USERS = { Admin: '0101', Clerk: '1234', Supervisor: '5678', Manager: '9999' };
 let currentUser = null;
 let currentProfile = null;
 
-function enterApp(profile) {
-    currentProfile = profile;
-    currentUser = profile.full_name || profile.username || profile.email;
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('appShell').style.display = 'grid';
-    document.getElementById('sbUserName').textContent = currentUser;
-    document.getElementById('sbAvatar').textContent = currentUser[0].toUpperCase();
-    loadAll();
-    toast(`👋 Welcome, ${currentUser}! Mombasa MCT Terminal TMS`, 'success');
+function showLanding() {
+    document.getElementById('landingScreen').classList.remove('hidden');
+    document.getElementById('authScreen').classList.add('hidden');
+}
+function showAuth(mode) {
+    document.getElementById('landingScreen').classList.add('hidden');
+    document.getElementById('authScreen').classList.remove('hidden');
+    document.getElementById('signInPanel').classList.toggle('hidden', mode !== 'signin');
+    document.getElementById('signUpPanel').classList.toggle('hidden', mode !== 'signup');
     document.getElementById('loginError').style.display = 'none';
+    document.getElementById('signupMsg').className = '';
+    window.scrollTo(0, 0);
+    setTimeout(() => {
+        const el = document.getElementById(mode === 'signup' ? 'suFullName' : 'loginUser');
+        if (el) el.focus();
+    }, 50);
+}
+window.showLanding = showLanding;
+window.showAuth = showAuth;
+
+const ORG_ROLES = ['port_user', 'transporter', 'depot_operator', 'agent_clerk', 'clearing_agent'];
+window.toggleSignupOrgField = () => {
+    const role = document.getElementById('suRole').value;
+    document.getElementById('suOrgField').classList.toggle('hidden', !ORG_ROLES.includes(role));
+};
+
+const ROLE_LABELS = { admin: 'Administrator', kpa_employee: 'KPA Employee', kpa_clerk: 'KPA Clerk', kpa_dispatcher: 'KPA Dispatcher', kpa_machine_operator: 'KPA Machine Operator', kpa_supervisor: 'KPA Supervisor', terminal_supervisor: 'Terminal Supervisor', yard_manager: 'Yard Manager', port_user: 'Port User', transporter: 'Transporter', depot_operator: 'Depot Operator', agent_clerk: 'Agent / Clerk', clearing_agent: 'Clearing Agent' };
+
+async function enterApp(displayName, roleLabel) {
+    currentUser = displayName;
+    document.getElementById('landingScreen').classList.add('hidden');
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('appShell').style.display = 'grid';
+    document.getElementById('sbUserName').textContent = displayName;
+    document.getElementById('sbAvatar').textContent = (displayName || '?')[0].toUpperCase();
+    const roleEl = document.querySelector('.sb-user-role');
+    if (roleEl && roleLabel) roleEl.textContent = roleLabel + ' · KPA MCT';
+    const isAdmin = currentProfile && currentProfile.role === 'admin';
+    document.getElementById('sbAdminSection').classList.toggle('hidden', !isAdmin);
+    document.getElementById('navApprovals').classList.toggle('hidden', !isAdmin);
+    await loadAll();
+    toast(`👋 Welcome, ${displayName}! Mombasa MCT Terminal TMS`, 'success');
     initAllSearchableDropdowns();
 }
 
-async function fetchOwnProfile() {
-    const { data: { user } } = await sb.auth.getUser();
-    if (!user) return null;
-    const { data, error } = await sb.from('profiles').select('id, email, full_name, role, username').eq('id', user.id).single();
-    if (error || !data) return null;
-    return data;
-}
-
-async function doLogin() {
-    const loginBtn = document.querySelector('.btn-login');
+window.doLogin = async () => {
     const u = document.getElementById('loginUser').value.trim();
     const p = document.getElementById('loginPass').value.trim();
     const errEl = document.getElementById('loginError');
-    if (!u || !p) { errEl.textContent = '⚠️ Enter username/email and password.'; errEl.style.display = 'block'; return; }
-    if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = 'Signing in…'; }
-    try {
-        let email = u;
-        if (!u.includes('@')) {
-            const { data: lookedUpEmail, error: lookupErr } = await sb.rpc('get_email_for_username', { p_username: u.toLowerCase() });
-            if (lookupErr || !lookedUpEmail) throw new Error('Invalid credentials');
-            email = lookedUpEmail;
+    errEl.style.display = 'none';
+    if (!u || !p) { errEl.textContent = '⚠️ Enter both username/email and password.'; errEl.style.display = 'block'; return; }
+
+    if (u.includes('@')) {
+        // Real Supabase Auth account
+        const { data, error } = await sb.auth.signInWithPassword({ email: u, password: p });
+        if (error || !data.session) {
+            errEl.textContent = '⚠️ Invalid credentials. Access denied.'; errEl.style.display = 'block';
+            document.getElementById('loginPass').value = ''; document.getElementById('loginPass').focus();
+            return;
         }
-        const { data: authData, error: authErr } = await sb.auth.signInWithPassword({ email, password: p });
-        if (authErr || !authData?.user) throw new Error('Invalid credentials');
-        const profile = await fetchOwnProfile();
-        if (!profile) throw new Error('No profile found for this account');
+        const { data: profile, error: pErr } = await sb.from('profiles').select('*').eq('id', data.user.id).single();
+        if (pErr || !profile) {
+            await sb.auth.signOut();
+            errEl.textContent = '⚠️ No profile found for this account. Contact an administrator.'; errEl.style.display = 'block';
+            return;
+        }
+        if (profile.status !== 'approved') {
+            await sb.auth.signOut();
+            const msg = profile.status === 'pending' ? '⏳ Your account is pending administrator approval.' :
+                profile.status === 'rejected' ? '⛔ Your account registration was not approved.' :
+                    '🚫 Your account has been suspended. Contact an administrator.';
+            errEl.textContent = msg; errEl.style.display = 'block';
+            return;
+        }
+        currentProfile = profile;
         document.getElementById('loginPass').value = '';
-        enterApp(profile);
-    } catch (e) {
-        errEl.textContent = '⚠️ Invalid credentials. Access denied.';
-        errEl.style.display = 'block';
+        await enterApp(profile.full_name || profile.email, ROLE_LABELS[profile.role] || profile.role);
+        return;
+    }
+
+    // Legacy local demo login
+    if (USERS[u] && USERS[u] === p) {
+        currentProfile = null;
+        document.getElementById('loginPass').value = '';
+        await enterApp(u, 'Local Demo Account');
+    } else {
+        errEl.textContent = '⚠️ Invalid credentials. Access denied.'; errEl.style.display = 'block';
         document.getElementById('loginPass').value = '';
         document.getElementById('loginPass').focus();
-    } finally {
-        if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = 'Sign In to Terminal TMS'; }
     }
+};
+
+window.doSignup = async () => {
+    const msgEl = document.getElementById('signupMsg');
+    msgEl.className = '';
+    const fullName = document.getElementById('suFullName').value.trim();
+    const email = document.getElementById('suEmail').value.trim();
+    const phone = document.getElementById('suPhone').value.trim();
+    const role = document.getElementById('suRole').value;
+    const org = document.getElementById('suOrg').value.trim();
+    const pass = document.getElementById('suPass').value;
+    const pass2 = document.getElementById('suPass2').value;
+
+    if (!fullName) return showSignupMsg('❌ Full name is required.', 'error');
+    if (!email || !email.includes('@')) return showSignupMsg('❌ A valid email is required.', 'error');
+    if (!role) return showSignupMsg('❌ Please select a role.', 'error');
+    if (ORG_ROLES.includes(role) && !org) return showSignupMsg('❌ Organization / company name is required for this role.', 'error');
+    if (!pass || pass.length < 6) return showSignupMsg('❌ Password must be at least 6 characters.', 'error');
+    if (pass !== pass2) return showSignupMsg('❌ Passwords do not match.', 'error');
+
+    const { data, error } = await sb.auth.signUp({
+        email, password: pass,
+        options: { data: { full_name: fullName, role, phone, organization: org, status: 'pending' } }
+    });
+    if (error) {
+        showSignupMsg(`❌ ${error.message || 'Could not create account.'}`, 'error');
+        return;
+    }
+    // Never leave a freshly-registered (pending) account signed in.
+    if (data.session) await sb.auth.signOut();
+    showSignupMsg('✅ Account created! It is now pending administrator approval — you\'ll be able to sign in once approved.', 'success');
+    ['suFullName', 'suEmail', 'suPhone', 'suOrg', 'suPass', 'suPass2'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('suRole').value = '';
+    document.getElementById('suOrgField').classList.add('hidden');
+    setTimeout(() => showAuth('signin'), 2600);
+};
+function showSignupMsg(text, type) {
+    const msgEl = document.getElementById('signupMsg');
+    msgEl.textContent = text; msgEl.className = type;
 }
 
-async function doLogout() {
-    await sb.auth.signOut();
-    currentUser = null;
-    currentProfile = null;
+window.doLogout = async () => {
+    if (currentProfile) await sb.auth.signOut();
+    currentUser = null; currentProfile = null;
     document.getElementById('appShell').style.display = 'none';
-    document.getElementById('loginScreen').classList.remove('hidden');
     document.getElementById('loginUser').value = '';
     document.getElementById('loginPass').value = '';
     document.getElementById('loginError').style.display = 'none';
-}
-
-// Restore an existing Supabase session on page load (refresh without re-login).
-// Called later, once `sb` (the Supabase client) has been initialized below.
-async function restoreSession() {
-    const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-        const profile = await fetchOwnProfile();
-        if (profile) enterApp(profile);
-        else await sb.auth.signOut();
-    }
-}
+    showLanding();
+};
 document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 document.getElementById('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginPass').focus(); });
+document.getElementById('suPass2').addEventListener('keydown', e => { if (e.key === 'Enter') doSignup(); });
 
 // ═══ DATA LAYER — Supabase (source of truth) + localStorage (instant local cache / offline fallback) ═══
 const SUPABASE_URL = 'https://ferxctlwemnxygacybku.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_bJ9D_4Npb8nOGleqIK2ICw_S6YS3D5a';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-restoreSession();
 
 const DB = { containers: [], logs: [], slips: [], shifts: [], shutouts: [], randomLoads: [] };
 const ImportDB = { containers: [], logs: [] };
@@ -125,7 +196,7 @@ let charts = {}, bulkData = [];
 const STORE_KEY = 'KPA_TMS_V10';
 const IMP_STORAGE = 'KPA_TMS_IMP_V10';
 
-// Explicit column maps for containers/import_containers — any object field not listed here is 
+// Explicit column maps for containers/import_containers — any object field not listed here is
 // preserved losslessly in the `extra` jsonb column, so the client model can evolve freely.
 const CONTAINER_COL_MAP = { id: 'id', line: 'line', vessel: 'vessel', voyage: 'voyage', pod: 'pod', type: 'type', source: 'source', status: 'status', yard: 'yard', positionSlip: 'position_slip', wagon: 'wagon', bay: 'bay', ksBay: 'ks_bay', ksClerk: 'ks_clerk', loadedBy: 'loaded_by', weight: 'weight', height: 'height', shiftCount: 'shift_count', shutout: 'shutout', created: 'created_at', gatedAt: 'gated_at', loaded: 'loaded_at', movements: 'movements' };
 const IMPORT_COL_MAP = { id: 'id', line: 'line', vessel: 'vessel', type: 'type', status: 'status', ttTag: 'tt_tag', yardBlock: 'yard_block', receivingClerk: 'receiving_clerk', rtgOperator: 'rtg_operator', releaseClerk: 'release_clerk', truckPlate: 'truck_plate', destination: 'destination', dischargedAt: 'discharged_at', releasedAt: 'released_at', movements: 'movements' };
@@ -506,7 +577,7 @@ function parseBulkCSV(text) {
     for (let i = 1; i < lines.length; i++) { const cols = lines[i].split(',').map(x => x.trim()); const id = (cols[ci] || '').toUpperCase(); const line = cols[li] || ''; const vessel = cols[vi] || ''; const voyage = vyi >= 0 ? cols[vyi] || '' : ''; const pod = pi >= 0 ? cols[pi] || '' : ''; const type = ti >= 0 ? cols[ti] || '20G0' : '20G0'; const sourceRaw = si >= 0 ? cols[si] || 'Gate18' : 'Gate18'; const vs = ['Gate18', 'Gate24', 'ICD', 'Vessel']; const source = vs.includes(sourceRaw) ? sourceRaw : 'Gate18'; const dup = findIdx(id) !== -1; const valid = !!(id && line && vessel && !dup); if (!valid && id) errors.push(`Row ${i}: ${id} — ${dup ? 'Duplicate' : 'Missing fields'}`); bulkData.push({ id, line, vessel, voyage, pod, type, source, valid, dup, row: i }); }
     renderBulkPreview(); document.getElementById('bErrors').innerHTML = errors.length ? `<strong>${errors.length} errors:</strong><br>` + errors.join('<br>') : ''; toast(`Parsed ${bulkData.length} containers — ${bulkData.filter(d => d.valid).length} valid`, 'info');
 }
-function renderBulkPreview() { document.getElementById('bulkPreview').classList.remove('hidden'); document.getElementById('bCount').textContent = bulkData.length; document.getElementById('bBody').innerHTML = bulkData.map(d => `<tr style="${d.valid ? '' : 'opacity:0.5;background:rgba(179,82,79,0.03)'}"><td>${d.row}</td><td class="tbl-id">${d.id || '—'}</td><td>${d.line || '—'}</td><td>${d.vessel || '—'}</td><td>${d.voyage || '—'}</td><td>${d.type || '—'}</td><td>${d.source}</td><td>${d.valid ? '<span class="text-success">✅ Valid</span>' : '<span class="text-danger">❌ ' + (d.dup ? 'Duplicate' : 'Missing') + '</span>'}</td></tr>`).join(''); }
+function renderBulkPreview() { document.getElementById('bulkPreview').classList.remove('hidden'); document.getElementById('bCount').textContent = bulkData.length; document.getElementById('bBody').innerHTML = bulkData.map(d => `<tr style="${d.valid ? '' : 'opacity:0.5;background:rgba(251,113,133,0.03)'}"><td>${d.row}</td><td class="tbl-id">${d.id || '—'}</td><td>${d.line || '—'}</td><td>${d.vessel || '—'}</td><td>${d.voyage || '—'}</td><td>${d.type || '—'}</td><td>${d.source}</td><td>${d.valid ? '<span class="text-success">✅ Valid</span>' : '<span class="text-danger">❌ ' + (d.dup ? 'Duplicate' : 'Missing') + '</span>'}</td></tr>`).join(''); }
 window.commitBulk = () => { const valid = bulkData.filter(d => d.valid); if (!valid.length) return toast('No valid containers to commit', 'error'); let added = 0; const now = Date.now(); valid.forEach(d => { if (findIdx(d.id) !== -1) return; const c = { id: d.id, line: d.line, vessel: d.vessel, voyage: d.voyage, pod: d.pod, type: d.type, source: d.source, status: 'PREADVISED', yard: '', positionSlip: '', created: now, preadviceTime: now, loaded: null, loadedBy: '', wagon: '', bay: '', movements: [], iso: d.type, weight: '4444.0', height: "8'", transco: '', plate: '', transtype: 'TRUCK', clerk: '', shiftCount: 0, shutout: false, ksBay: '', ksClerk: '' }; addMov(c, 'PREADVISED', `Bulk pre-advised — ${d.source}`); DB.containers.push(c); log(d.id, 'PREADVISED_BULK', `Line:${d.line} Source:${d.source}`); added++; }); save(); renderAll(); updateNavBadges(); clearBulk(); toast(`✅ ${added} containers pre-advised via bulk upload`, 'success'); };
 window.clearBulk = () => { bulkData = []; document.getElementById('bulkPreview').classList.add('hidden'); document.getElementById('bulkFile').value = ''; document.getElementById('bErrors').innerHTML = ''; };
 
@@ -885,7 +956,7 @@ window.showDetail = (id) => {
       <div class="info-row"><span class="text-muted">Weight</span><span>${c.weight || '—'} kg</span></div>
     </div>
     ${cShifts.length ? `<div class="divider"></div><div class="card-title">🔀 Shift History (${cShifts.length})</div><div class="scroll-table" style="max-height:120px;background:rgba(6,11,22,0.5);padding:0.75rem;border-radius:9px">${cShifts.map(s => `<div class="info-row"><span>${s.from} → <strong>${s.to}</strong> · ${s.reason}</span><span class="text-xs text-muted">${new Date(s.shiftedAt).toLocaleString()}</span></div>`).join('')}</div>` : ''}
-    ${cShutouts.length ? `<div class="divider"></div><div class="card-title">🚫 Shutout Records (${cShutouts.length})</div><div class="scroll-table" style="max-height:100px;background:rgba(179,82,79,0.05);padding:0.75rem;border-radius:9px">${cShutouts.map(s => `<div class="info-row"><span class="text-danger">${s.reason}</span><span class="text-xs text-muted">${new Date(s.shutoutAt).toLocaleString()}</span></div>`).join('')}</div>` : ''}
+    ${cShutouts.length ? `<div class="divider"></div><div class="card-title">🚫 Shutout Records (${cShutouts.length})</div><div class="scroll-table" style="max-height:100px;background:rgba(251,113,133,0.05);padding:0.75rem;border-radius:9px">${cShutouts.map(s => `<div class="info-row"><span class="text-danger">${s.reason}</span><span class="text-xs text-muted">${new Date(s.shutoutAt).toLocaleString()}</span></div>`).join('')}</div>` : ''}
     <div class="divider"></div>
     <div class="card-title">📋 Workflow</div><div class="workflow">${wfHTML}</div>
     <div class="divider"></div>
@@ -1148,7 +1219,7 @@ function renderDashboard() {
     const buckets = { '<24h': 0, '24-48h': 0, '48-72h': 0, '3-5d': 0, '5-7d': 0, '>7d': 0 };
     active.forEach(c => { const h = dwellHours(c); if (h < 24) buckets['<24h']++; else if (h < 48) buckets['24-48h']++; else if (h < 72) buckets['48-72h']++; else if (h < 120) buckets['3-5d']++; else if (h < 168) buckets['5-7d']++; else buckets['>7d']++; });
     const maxB = Math.max(...Object.values(buckets), 1);
-    document.getElementById('dwellBuckets').innerHTML = Object.entries(buckets).map(([label, n]) => `<div><div class="flex justify-between text-xs mb-1"><span style="color:var(--text-2)">${label}</span><span class="font-bold">${n}</span></div><div style="height:4px;background:rgba(74,123,171,0.08);border-radius:99px;overflow:hidden"><div style="width:${n / maxB * 100}%;height:100%;background:${n / maxB > 0.6 ? 'linear-gradient(90deg,#e11d48,#b3524f)' : n / maxB > 0.3 ? 'linear-gradient(90deg,#d97706,#c9922b)' : 'linear-gradient(90deg,#3d6690,#4a7bab)'};border-radius:99px"></div></div></div>`).join('');
+    document.getElementById('dwellBuckets').innerHTML = Object.entries(buckets).map(([label, n]) => `<div><div class="flex justify-between text-xs mb-1"><span style="color:var(--text-2)">${label}</span><span class="font-bold">${n}</span></div><div style="height:4px;background:rgba(56,189,248,0.08);border-radius:99px;overflow:hidden"><div style="width:${n / maxB * 100}%;height:100%;background:${n / maxB > 0.6 ? 'linear-gradient(90deg,#e11d48,#fb7185)' : n / maxB > 0.3 ? 'linear-gradient(90deg,#d97706,#fbbf24)' : 'linear-gradient(90deg,#0ea5e9,#38bdf8)'};border-radius:99px"></div></div></div>`).join('');
     document.getElementById('overdueList').innerHTML = overdue.slice(0, 8).map(c => `<div class="info-row"><span class="tbl-id" onclick="showDetail('${c.id}')">${c.id}</span><span class="overdue">${Math.abs(freeDaysLeft(c) / 24).toFixed(1)}d overdue</span></div>`).join('') || '<span class="text-success text-sm">✅ All containers within free time</span>';
 
     // ── Workflow snapshot ──
@@ -1273,6 +1344,76 @@ function updateNavBadges() {
     if (nb('nb-random')) nb('nb-random').textContent = DB.randomLoads.length;
 }
 
+// ═══ USER APPROVALS (admin only) ═══
+let _profilesCache = [];
+const STATUS_LABEL = { pending: '⏳ Pending', approved: '✅ Approved', rejected: '⛔ Rejected', suspended: '🚫 Suspended' };
+const STATUS_BADGE_CLASS = { pending: 'b-preadvised', approved: 'b-gated', rejected: 'b-shutout', suspended: 'b-out' };
+async function renderApprovals() {
+    const isAdmin = currentProfile && currentProfile.role === 'admin';
+    if (!isAdmin) return;
+    const { data, error } = await sb.from('profiles').select('*').order('created_at', { ascending: false });
+    if (error) { toast('⚠️ Could not load accounts: ' + error.message, 'error'); return; }
+    _profilesCache = data || [];
+
+    const counts = { pending: 0, approved: 0, rejected: 0, suspended: 0 };
+    _profilesCache.forEach(p => { if (counts[p.status] !== undefined) counts[p.status]++; });
+    document.getElementById('approvalsStats').innerHTML = `
+    <div class="sec-card"><div class="sc-icon">⏳</div><div class="sc-val">${counts.pending}</div><div class="sc-lbl">Pending</div></div>
+    <div class="sec-card"><div class="sc-icon">✅</div><div class="sc-val">${counts.approved}</div><div class="sc-lbl">Approved</div></div>
+    <div class="sec-card"><div class="sc-icon">⛔</div><div class="sc-val">${counts.rejected}</div><div class="sc-lbl">Rejected</div></div>
+    <div class="sec-card"><div class="sc-icon">🚫</div><div class="sc-val">${counts.suspended}</div><div class="sc-lbl">Suspended</div></div>`;
+    document.getElementById('nb-approvals').textContent = counts.pending;
+
+    const search = (document.getElementById('approvalsSearch')?.value || '').toLowerCase();
+    const statusFilter = document.getElementById('approvalsStatusFilter')?.value || '';
+    let arr = _profilesCache;
+    if (statusFilter) arr = arr.filter(p => p.status === statusFilter);
+    if (search) arr = arr.filter(p => [p.full_name, p.email, p.organization].join(' ').toLowerCase().includes(search));
+
+    const roleOptions = Object.entries(ROLE_LABELS).filter(([v]) => v !== 'admin').map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+    document.getElementById('approvalsBody').innerHTML = arr.map(p => {
+        const actions = [];
+        if (p.status === 'pending') {
+            actions.push(`<button class="btn btn-xs btn-success" onclick="approveUser('${p.id}')">✅ Approve</button>`);
+            actions.push(`<button class="btn btn-xs btn-danger" onclick="rejectUser('${p.id}')">⛔ Reject</button>`);
+        }
+        if (p.status === 'approved' && p.role !== 'admin') {
+            actions.push(`<button class="btn btn-xs btn-danger" onclick="suspendUser('${p.id}')">🚫 Suspend</button>`);
+        }
+        if (p.status === 'suspended' || p.status === 'rejected') {
+            actions.push(`<button class="btn btn-xs btn-success" onclick="approveUser('${p.id}')">✅ Reactivate</button>`);
+        }
+        const roleSelect = p.role === 'admin' ? `<span class="badge b-loaded">Administrator</span>` :
+            `<select class="tbl-inline-select" onchange="changeUserRole('${p.id}',this.value)">${roleOptions.replace(`value="${p.role}"`, `value="${p.role}" selected`)}</select>`;
+        return `<tr>
+      <td>${p.full_name || '—'}</td>
+      <td>${p.email}</td>
+      <td>${roleSelect}</td>
+      <td>${p.organization || '—'}</td>
+      <td>${p.phone || '—'}</td>
+      <td><span class="badge ${STATUS_BADGE_CLASS[p.status] || ''}">${STATUS_LABEL[p.status] || p.status}</span></td>
+      <td style="font-size:0.7rem">${new Date(p.created_at).toLocaleString()}</td>
+      <td class="btn-group">${actions.join('') || '—'}</td>
+    </tr>`;
+    }).join('') || '<tr><td colspan="8" class="text-muted" style="text-align:center;padding:1.5rem">No accounts match this filter</td></tr>';
+    document.getElementById('approvalsCount').textContent = `${arr.length} account${arr.length === 1 ? '' : 's'}`;
+}
+async function setUserStatus(id, status, successMsg) {
+    const { error } = await sb.from('profiles').update({ status }).eq('id', id);
+    if (error) { toast('⚠️ Could not update account: ' + error.message, 'error'); return; }
+    toast(successMsg, 'success');
+    renderApprovals();
+}
+window.approveUser = (id) => setUserStatus(id, 'approved', '✅ Account approved — the user can now sign in.');
+window.rejectUser = (id) => { if (confirm('Reject this account? The user will not be able to sign in.')) setUserStatus(id, 'rejected', '⛔ Account rejected.'); };
+window.suspendUser = (id) => { if (confirm('Suspend this account? The user will be signed out and blocked immediately.')) setUserStatus(id, 'suspended', '🚫 Account suspended.'); };
+window.changeUserRole = async (id, role) => {
+    const { error } = await sb.from('profiles').update({ role }).eq('id', id);
+    if (error) { toast('⚠️ Could not update role: ' + error.message, 'error'); renderApprovals(); return; }
+    toast(`🧭 Role updated to ${ROLE_LABELS[role] || role}`, 'success');
+    renderApprovals();
+};
+
 async function resetAllSystemData() {
     if (!confirm('!!! DANGER !!! This will erase ALL terminal data (local AND Supabase). This action is irreversible. Proceed?')) return;
     const check = prompt('Type "CONFIRM" to delete all data:');
@@ -1329,7 +1470,7 @@ function parseImportBulkCSV(text) {
     for (let i = 1; i < lines.length; i++) { const cols = lines[i].split(',').map(x => x.trim()); const id = (cols[ci] || '').toUpperCase(); const line = cols[li] || ''; const vessel = cols[vi] || ''; const type = (ti >= 0 ? cols[ti] : '20G0') || '20G0'; const voyage = vyi >= 0 ? cols[vyi] || '' : ''; const valid = !!(id && line && vessel && !ImportDB.containers.some(c => c.id === id)); if (!valid && id) errors.push(`Row ${i}: ${id} — ${ImportDB.containers.some(c => c.id === id) ? 'Duplicate' : 'Missing fields'}`); importBulkData.push({ id, line, vessel, type, voyage, valid, row: i }); }
     renderImportBulkPreview(); document.getElementById('importBulkErrors').innerHTML = errors.length ? `<strong>${errors.length} errors:</strong><br>${errors.join('<br>')}` : '';; toast(`Parsed ${importBulkData.length} containers — ${importBulkData.filter(d => d.valid).length} valid`, 'info');
 }
-function renderImportBulkPreview() { document.getElementById('importBulkPreview').classList.remove('hidden'); document.getElementById('importBulkCount').textContent = importBulkData.length; document.getElementById('importBulkBody').innerHTML = importBulkData.map(d => `<tr style="${d.valid ? '' : 'opacity:0.5;background:rgba(179,82,79,0.03)'}"><td>${d.row}</td><td class="tbl-id">${d.id || '—'}</td><td>${d.line || '—'}</td><td>${d.vessel || '—'}</td><td>${d.type || '—'}</td><td>${d.voyage || '—'}</td><td>${d.valid ? '<span class="text-success">✅ Valid</span>' : '<span class="text-danger">❌ Invalid</span>'}</td></tr>`).join(''); }
+function renderImportBulkPreview() { document.getElementById('importBulkPreview').classList.remove('hidden'); document.getElementById('importBulkCount').textContent = importBulkData.length; document.getElementById('importBulkBody').innerHTML = importBulkData.map(d => `<tr style="${d.valid ? '' : 'opacity:0.5;background:rgba(251,113,133,0.03)'}"><td>${d.row}</td><td class="tbl-id">${d.id || '—'}</td><td>${d.line || '—'}</td><td>${d.vessel || '—'}</td><td>${d.type || '—'}</td><td>${d.voyage || '—'}</td><td>${d.valid ? '<span class="text-success">✅ Valid</span>' : '<span class="text-danger">❌ Invalid</span>'}</td></tr>`).join(''); }
 function commitImportBulk() { const valid = importBulkData.filter(d => d.valid); if (!valid.length) return toast('No valid containers to commit', 'error'); let added = 0; const now = Date.now(); valid.forEach(d => { if (ImportDB.containers.some(c => c.id === d.id)) return; ImportDB.containers.push({ id: d.id, line: d.line, vessel: d.vessel, voyage: d.voyage, type: d.type, status: 'VESSEL_DISCHARGED', dischargedAt: now, ttTag: '', yardBlock: '', receivingClerk: '', rtgOperator: '', releaseClerk: '', truckPlate: '', transco: '', destination: '', movements: [] }); impLog(d.id, 'BULK_IMPORT', `Vessel:${d.vessel} Type:${d.type}`); added++; }); impSave(); renderImportStats(); renderImportTable(); renderImportCharts(); clearImportBulk(); toast(`✅ ${added} import containers added`, 'success'); }
 function clearImportBulk() { importBulkData = []; document.getElementById('importBulkPreview').classList.add('hidden'); document.getElementById('importBulkFile').value = ''; document.getElementById('importBulkErrors').innerHTML = ''; }
 function moveToTagMaster() { const id = tsGetValue('imp-tag-id'); const tt = document.getElementById('imp-tag-tt').value.trim(); if (!id) return toast('Select a container', 'error'); if (!tt) return toast('TT / Tag ID is required', 'error'); const imp = ImportDB.containers.find(c => c.id === id); if (!imp) return toast('Container not found', 'error'); if (imp.status !== 'VESSEL_DISCHARGED') return toast(`Status must be VESSEL_DISCHARGED, current: ${imp.status}`, 'error'); imp.status = 'AT_TAG_MASTER'; imp.ttTag = tt; imp.movements = imp.movements || []; imp.movements.push({ status: 'AT_TAG_MASTER', note: `Tag Master TT:${tt}`, time: Date.now(), user: currentUser }); impLog(id, 'TAG_MASTER', `TT:${tt}`); impSave(); renderImportStats(); renderImportTable(); renderImportCharts(); tsSetValue('imp-tag-id', ''); document.getElementById('imp-tag-tt').value = ''; toast(`🚛 ${id} moved to Tag Master (${tt})`, 'success'); }
@@ -1339,7 +1480,7 @@ function releaseContainerOut() { const id = tsGetValue('imp-release-id'); const 
 function renderImportStats() { const all = ImportDB.containers; const discharged = all.filter(c => c.status === 'VESSEL_DISCHARGED').length; const tag = all.filter(c => c.status === 'AT_TAG_MASTER').length; const yard = all.filter(c => c.status === 'RECEIVED_YARD').length; const offloaded = all.filter(c => c.status === 'OFFLOADED_RTG').length; const released = all.filter(c => c.status === 'RELEASED_OUT').length; document.getElementById('importStatsGrid').innerHTML = `<div class="sec-card"><div class="sc-icon">⛴️</div><div class="sc-val">${discharged}</div><div class="sc-lbl">Vessel Discharged</div></div><div class="sec-card"><div class="sc-icon">🚛</div><div class="sc-val">${tag}</div><div class="sc-lbl">Tag Master</div></div><div class="sec-card"><div class="sc-icon">📍</div><div class="sc-val">${yard}</div><div class="sc-lbl">Yard Staged</div></div><div class="sec-card"><div class="sc-icon">🏗️</div><div class="sc-val">${offloaded}</div><div class="sc-lbl">RTG Offloaded</div></div><div class="sec-card"><div class="sc-icon">🚪</div><div class="sc-val">${released}</div><div class="sc-lbl">Released Out</div></div>`; }
 let importCharts = {};
 function renderImportTable() { const search = document.getElementById('impSearch')?.value.toLowerCase() || ''; const statusFilter = document.getElementById('impStatusFilter')?.value || ''; const lineFilter = tsGetValue('impLineFilter') || ''; let arr = ImportDB.containers.slice().sort((a, b) => b.dischargedAt - a.dischargedAt); if (statusFilter) arr = arr.filter(c => c.status === statusFilter); if (lineFilter) arr = arr.filter(c => c.line === lineFilter); if (search) arr = arr.filter(c => [c.id, c.line, c.vessel, c.yardBlock, c.ttTag].join(' ').toLowerCase().includes(search)); document.getElementById('importTbody').innerHTML = arr.map(c => `<tr><td><span class="tbl-id" onclick="showImportDetail('${c.id}')">${c.id}</span></td><td>${c.line}</td><td>${c.vessel}</td><td>${c.type}</td><td>${impBadge(c.status)}</td><td>${c.ttTag || '—'}</td><td>${c.yardBlock || '—'}</td><td>${c.receivingClerk || '—'}</td><td>${c.rtgOperator || '—'}</td><td>${c.releaseClerk || '—'}</td><td>${c.truckPlate || '—'}</td><td>${freeImport(c)}</td><td>${dwellImport(c).toFixed(1)}h</td><td><button class="btn btn-xs btn-secondary" onclick="showImportDetail('${c.id}')">📋</button></td></tr>`).join('') || '<tr><td colspan="14" class="text-muted" style="text-align:center">No import containers</td></tr>'; }
-function renderImportCharts() { const statusCounts = { VESSEL_DISCHARGED: 0, AT_TAG_MASTER: 0, RECEIVED_YARD: 0, OFFLOADED_RTG: 0, RELEASED_OUT: 0 }; ImportDB.containers.forEach(c => statusCounts[c.status]++); const ctx1 = document.getElementById('importStatusChart')?.getContext('2d'); if (ctx1) { if (importCharts.status) importCharts.status.destroy(); importCharts.status = new Chart(ctx1, { type: 'doughnut', data: { labels: Object.keys(statusCounts).map(s => IMP_LABELS[s]), datasets: [{ data: Object.values(statusCounts), backgroundColor: ['#3d6690', '#7c8db5', '#2f9e63', '#c9922b', '#b3524f'] }] }, options: { responsive: true, maintainAspectRatio: true } }); } const lineCounts = {}; ImportDB.containers.forEach(c => lineCounts[c.line] = (lineCounts[c.line] || 0) + 1); const ctx2 = document.getElementById('importLineChart')?.getContext('2d'); if (ctx2) { if (importCharts.line) importCharts.line.destroy(); importCharts.line = new Chart(ctx2, { type: 'bar', data: { labels: Object.keys(lineCounts), datasets: [{ label: 'Containers', data: Object.values(lineCounts), backgroundColor: '#4a7bab' }] }, options: { responsive: true } }); } const dwellBins = { '<24h': 0, '24-48h': 0, '48-72h': 0, '72-96h': 0, '>96h': 0 }; ImportDB.containers.forEach(c => { const h = dwellImport(c); if (h < 24) dwellBins['<24h']++; else if (h < 48) dwellBins['24-48h']++; else if (h < 72) dwellBins['48-72h']++; else if (h < 96) dwellBins['72-96h']++; else dwellBins['>96h']++; }); const ctx3 = document.getElementById('importDwellChart')?.getContext('2d'); if (ctx3) { if (importCharts.dwell) importCharts.dwell.destroy(); importCharts.dwell = new Chart(ctx3, { type: 'bar', data: { labels: Object.keys(dwellBins), datasets: [{ label: 'Containers', data: Object.values(dwellBins), backgroundColor: '#c9922b' }] }, options: { responsive: true } }); } const clerkStats = {}; ImportDB.containers.filter(c => c.releaseClerk).forEach(c => clerkStats[c.releaseClerk] = (clerkStats[c.releaseClerk] || 0) + 1); document.getElementById('importReleaseStats').innerHTML = Object.entries(clerkStats).sort((a, b) => b[1] - a[1]).map(([name, count]) => `<div class="info-row"><span>${name}</span><span class="font-bold text-accent">${count}</span></div>`).join('') || '<span class="text-muted">No releases yet</span>'; }
+function renderImportCharts() { const statusCounts = { VESSEL_DISCHARGED: 0, AT_TAG_MASTER: 0, RECEIVED_YARD: 0, OFFLOADED_RTG: 0, RELEASED_OUT: 0 }; ImportDB.containers.forEach(c => statusCounts[c.status]++); const ctx1 = document.getElementById('importStatusChart')?.getContext('2d'); if (ctx1) { if (importCharts.status) importCharts.status.destroy(); importCharts.status = new Chart(ctx1, { type: 'doughnut', data: { labels: Object.keys(statusCounts).map(s => IMP_LABELS[s]), datasets: [{ data: Object.values(statusCounts), backgroundColor: ['#0ea5e9', '#a78bfa', '#34d399', '#fbbf24', '#fb7185'] }] }, options: { responsive: true, maintainAspectRatio: true } }); } const lineCounts = {}; ImportDB.containers.forEach(c => lineCounts[c.line] = (lineCounts[c.line] || 0) + 1); const ctx2 = document.getElementById('importLineChart')?.getContext('2d'); if (ctx2) { if (importCharts.line) importCharts.line.destroy(); importCharts.line = new Chart(ctx2, { type: 'bar', data: { labels: Object.keys(lineCounts), datasets: [{ label: 'Containers', data: Object.values(lineCounts), backgroundColor: '#38bdf8' }] }, options: { responsive: true } }); } const dwellBins = { '<24h': 0, '24-48h': 0, '48-72h': 0, '72-96h': 0, '>96h': 0 }; ImportDB.containers.forEach(c => { const h = dwellImport(c); if (h < 24) dwellBins['<24h']++; else if (h < 48) dwellBins['24-48h']++; else if (h < 72) dwellBins['48-72h']++; else if (h < 96) dwellBins['72-96h']++; else dwellBins['>96h']++; }); const ctx3 = document.getElementById('importDwellChart')?.getContext('2d'); if (ctx3) { if (importCharts.dwell) importCharts.dwell.destroy(); importCharts.dwell = new Chart(ctx3, { type: 'bar', data: { labels: Object.keys(dwellBins), datasets: [{ label: 'Containers', data: Object.values(dwellBins), backgroundColor: '#fbbf24' }] }, options: { responsive: true } }); } const clerkStats = {}; ImportDB.containers.filter(c => c.releaseClerk).forEach(c => clerkStats[c.releaseClerk] = (clerkStats[c.releaseClerk] || 0) + 1); document.getElementById('importReleaseStats').innerHTML = Object.entries(clerkStats).sort((a, b) => b[1] - a[1]).map(([name, count]) => `<div class="info-row"><span>${name}</span><span class="font-bold text-accent">${count}</span></div>`).join('') || '<span class="text-muted">No releases yet</span>'; }
 function showImportDetail(id) { const c = ImportDB.containers.find(c => c.id === id); if (!c) return; document.getElementById('importDetailTitle').textContent = `${c.id} — Import Container`; document.getElementById('importDetailBody').innerHTML = `<div class="grid-2"><div class="info-row"><span>Line</span><span>${c.line}</span></div><div class="info-row"><span>Vessel</span><span>${c.vessel} / ${c.voyage || ''}</span></div><div class="info-row"><span>Type</span><span>${c.type}</span></div><div class="info-row"><span>Status</span>${impBadge(c.status)}</div><div class="info-row"><span>Discharged At</span><span>${new Date(c.dischargedAt).toLocaleString()}</span></div><div class="info-row"><span>TT/Tag</span><span>${c.ttTag || '—'}</span></div><div class="info-row"><span>Yard Block</span><span>${c.yardBlock || '—'}</span></div><div class="info-row"><span>Receiving Clerk</span><span>${c.receivingClerk || '—'}</span></div><div class="info-row"><span>RTG Operator</span><span>${c.rtgOperator || '—'}</span></div><div class="info-row"><span>Release Clerk</span><span>${c.releaseClerk || '—'}</span></div><div class="info-row"><span>Truck Plate</span><span>${c.truckPlate || '—'}</span></div><div class="info-row"><span>Transport Co.</span><span>${c.transco || '—'}</span></div><div class="info-row"><span>Destination</span><span>${c.destination || '—'}</span></div><div class="info-row"><span>Dwell (h)</span><span>${dwellImport(c).toFixed(1)}h</span></div><div class="info-row"><span>Free Time Left</span>${freeImport(c)}</div></div><div class="divider"></div><div class="card-title">Movement History</div><div class="scroll-table">${(c.movements || []).map(m => `<div class="info-row"><span>${m.note || m.status}</span><span class="text-xs">${new Date(m.time).toLocaleString()} · ${m.user || 'System'}</span></div>`).join('') || '<span class="text-muted">No movements</span>'}</div>`; document.getElementById('importDetailModal').classList.remove('hidden'); }
 function closeImportDetailModal(e) { if (!e || e.target === document.getElementById('importDetailModal')) document.getElementById('importDetailModal').classList.add('hidden'); }
 function exportImportCSV() { let csv = 'Container ID,Line,Vessel,Type,Status,TT/Tag,Yard,Receiving Clerk,RTG Operator,Release Clerk,Truck,Transco,Destination,Dwell(h),Released At\n'; ImportDB.containers.forEach(c => { csv += `${c.id},${c.line},${c.vessel},${c.type},${c.status},${c.ttTag || ''},${c.yardBlock || ''},${c.receivingClerk || ''},${c.rtgOperator || ''},${c.releaseClerk || ''},${c.truckPlate || ''},${c.transco || ''},${c.destination || ''},${dwellImport(c).toFixed(1)},"${c.releasedAt ? new Date(c.releasedAt).toLocaleString() : ''}"\n`; }); dlFile(csv, 'text/csv', 'kpa_imports.csv'); toast('📥 Imports CSV exported', 'success'); }
@@ -1362,14 +1503,14 @@ function renderReports() {
     const kpis = { 'Total Containers': filtered.length, 'Gated In': filtered.filter(c => c.status === 'GATED_IN').length, 'Key Site': filtered.filter(c => c.status === 'KEY_SITE').length, 'Loaded': filtered.filter(c => c.status === 'LOADED_VESSEL').length, 'Avg Dwell (h)': (filtered.reduce((a, c) => a + dwellHours(c), 0) / filtered.length || 0).toFixed(1) };
     document.getElementById('rpt-kpi-row').innerHTML = Object.entries(kpis).map(([k, v]) => `<div class="report-kpi"><div class="rk-val">${v}</div><div class="rk-lbl">${k}</div></div>`).join('');
     const statusCounts = {}; filtered.forEach(c => statusCounts[c.status] = (statusCounts[c.status] || 0) + 1);
-    const ctxStatus = document.getElementById('chartStatus')?.getContext('2d'); if (ctxStatus) { if (reportCharts.status) reportCharts.status.destroy(); reportCharts.status = new Chart(ctxStatus, { type: 'bar', data: { labels: Object.keys(statusCounts).map(s => STATUS_META[s]?.label || s), datasets: [{ label: 'Containers', data: Object.values(statusCounts), backgroundColor: '#4a7bab' }] }, options: { responsive: true, maintainAspectRatio: true } }); }
+    const ctxStatus = document.getElementById('chartStatus')?.getContext('2d'); if (ctxStatus) { if (reportCharts.status) reportCharts.status.destroy(); reportCharts.status = new Chart(ctxStatus, { type: 'bar', data: { labels: Object.keys(statusCounts).map(s => STATUS_META[s]?.label || s), datasets: [{ label: 'Containers', data: Object.values(statusCounts), backgroundColor: '#38bdf8' }] }, options: { responsive: true, maintainAspectRatio: true } }); }
     const lineCounts = {}; filtered.forEach(c => lineCounts[c.line] = (lineCounts[c.line] || 0) + 1);
-    const ctxLine = document.getElementById('chartLine')?.getContext('2d'); if (ctxLine) { if (reportCharts.line) reportCharts.line.destroy(); reportCharts.line = new Chart(ctxLine, { type: 'pie', data: { labels: Object.keys(lineCounts), datasets: [{ data: Object.values(lineCounts), backgroundColor: ['#3d6690', '#2f9e63', '#c9922b', '#7c8db5', '#b3524f'] }] }, options: { responsive: true } }); }
+    const ctxLine = document.getElementById('chartLine')?.getContext('2d'); if (ctxLine) { if (reportCharts.line) reportCharts.line.destroy(); reportCharts.line = new Chart(ctxLine, { type: 'pie', data: { labels: Object.keys(lineCounts), datasets: [{ data: Object.values(lineCounts), backgroundColor: ['#0ea5e9', '#34d399', '#fbbf24', '#a78bfa', '#fb7185'] }] }, options: { responsive: true } }); }
     const sourceCounts = { Gate18: 0, Gate24: 0, ICD: 0, Vessel: 0 }; filtered.forEach(c => sourceCounts[c.source] = (sourceCounts[c.source] || 0) + 1);
-    const ctxSource = document.getElementById('chartSource')?.getContext('2d'); if (ctxSource) { if (reportCharts.source) reportCharts.source.destroy(); reportCharts.source = new Chart(ctxSource, { type: 'doughnut', data: { labels: Object.keys(sourceCounts), datasets: [{ data: Object.values(sourceCounts), backgroundColor: ['#4a7bab', '#2f9e63', '#7c8db5', '#c9922b'] }] }, options: { responsive: true } }); }
+    const ctxSource = document.getElementById('chartSource')?.getContext('2d'); if (ctxSource) { if (reportCharts.source) reportCharts.source.destroy(); reportCharts.source = new Chart(ctxSource, { type: 'doughnut', data: { labels: Object.keys(sourceCounts), datasets: [{ data: Object.values(sourceCounts), backgroundColor: ['#38bdf8', '#34d399', '#a78bfa', '#fbbf24'] }] }, options: { responsive: true } }); }
     const vesselGated = {}; const vesselLoaded = {}; filtered.forEach(c => { if (c.status === 'GATED_IN') vesselGated[c.vessel] = (vesselGated[c.vessel] || 0) + 1; if (c.status === 'LOADED_VESSEL') vesselLoaded[c.vessel] = (vesselLoaded[c.vessel] || 0) + 1; });
-    const ctxGated = document.getElementById('chartGatedVessel')?.getContext('2d'); if (ctxGated) { if (reportCharts.gated) reportCharts.gated.destroy(); reportCharts.gated = new Chart(ctxGated, { type: 'bar', data: { labels: Object.keys(vesselGated), datasets: [{ label: 'Gated In', data: Object.values(vesselGated), backgroundColor: '#3d6690' }] }, options: { responsive: true } }); }
-    const ctxLoaded = document.getElementById('chartLoaded')?.getContext('2d'); if (ctxLoaded) { if (reportCharts.loaded) reportCharts.loaded.destroy(); reportCharts.loaded = new Chart(ctxLoaded, { type: 'bar', data: { labels: Object.keys(vesselLoaded), datasets: [{ label: 'Loaded', data: Object.values(vesselLoaded), backgroundColor: '#2f9e63' }] }, options: { responsive: true } }); }
+    const ctxGated = document.getElementById('chartGatedVessel')?.getContext('2d'); if (ctxGated) { if (reportCharts.gated) reportCharts.gated.destroy(); reportCharts.gated = new Chart(ctxGated, { type: 'bar', data: { labels: Object.keys(vesselGated), datasets: [{ label: 'Gated In', data: Object.values(vesselGated), backgroundColor: '#0ea5e9' }] }, options: { responsive: true } }); }
+    const ctxLoaded = document.getElementById('chartLoaded')?.getContext('2d'); if (ctxLoaded) { if (reportCharts.loaded) reportCharts.loaded.destroy(); reportCharts.loaded = new Chart(ctxLoaded, { type: 'bar', data: { labels: Object.keys(vesselLoaded), datasets: [{ label: 'Loaded', data: Object.values(vesselLoaded), backgroundColor: '#34d399' }] }, options: { responsive: true } }); }
     document.getElementById('rpt-container-tbody').innerHTML = filtered.slice(0, 100).map(c => `<tr><td>${c.id}</td><td>${c.line}</td><td>${c.vessel}</td><td>${c.type}</td><td>${c.source}</td><td>${badge(c.status)}</td><td>${c.yard || '—'}</td><td>${dwellHours(c).toFixed(1)}</td><td>${freeTimeDisplay(c)}</td><td>${c.shiftCount || 0}</td><td>${c.positionSlip || '—'}</td></tr>`).join('') || '<tr><td colspan="11">No containers match filters</td></tr>';
     document.getElementById('rpt-vessel-tbody').innerHTML = [...new Set(filtered.map(c => c.vessel))].map(v => { const gatedCnt = filtered.filter(c => c.vessel === v && c.status === 'GATED_IN').length; const ksCnt = filtered.filter(c => c.vessel === v && c.status === 'KEY_SITE').length; const loadedCnt = filtered.filter(c => c.vessel === v && c.status === 'LOADED_VESSEL').length; const shutCnt = filtered.filter(c => c.vessel === v && c.shutout).length; const rate = loadedCnt ? ((loadedCnt / (loadedCnt + shutCnt)) * 100).toFixed(1) : 0; return `<tr><td>${v}</td><td>${gatedCnt}</td><td>${ksCnt}</td><td>${loadedCnt}</td><td>${shutCnt}</td><td>${rate}%</td></tr>`; }).join('');
     const clerkStats = {}; filtered.filter(c => c.loadedBy).forEach(c => clerkStats[c.loadedBy] = (clerkStats[c.loadedBy] || 0) + 1);
@@ -1377,23 +1518,23 @@ function renderReports() {
     const gateClerks = {}; DB.slips.forEach(s => { if (s.clerk) gateClerks[s.clerk] = (gateClerks[s.clerk] || 0) + 1; });
     document.getElementById('rpt-clerk-tbody').innerHTML = Object.entries(gateClerks).sort((a, b) => b[1] - a[1]).map(([clerk, count]) => `<tr><td>${clerk}</td><td>${count}</td><td>Gate</td><td>—</td></tr>`).join('') || '<tr><td colspan="4">No gate activity</td></tr>';
     const dwellBins = { '<24h': 0, '24-48h': 0, '48-72h': 0, '3-5d': 0, '5-7d': 0, '>7d': 0 }; filtered.forEach(c => { const h = dwellHours(c); if (h < 24) dwellBins['<24h']++; else if (h < 48) dwellBins['24-48h']++; else if (h < 72) dwellBins['48-72h']++; else if (h < 120) dwellBins['3-5d']++; else if (h < 168) dwellBins['5-7d']++; else dwellBins['>7d']++; });
-    const ctxDwell = document.getElementById('chartDwell')?.getContext('2d'); if (ctxDwell) { if (reportCharts.dwell) reportCharts.dwell.destroy(); reportCharts.dwell = new Chart(ctxDwell, { type: 'bar', data: { labels: Object.keys(dwellBins), datasets: [{ label: 'Containers', data: Object.values(dwellBins), backgroundColor: '#c9922b' }] }, options: { responsive: true } }); }
+    const ctxDwell = document.getElementById('chartDwell')?.getContext('2d'); if (ctxDwell) { if (reportCharts.dwell) reportCharts.dwell.destroy(); reportCharts.dwell = new Chart(ctxDwell, { type: 'bar', data: { labels: Object.keys(dwellBins), datasets: [{ label: 'Containers', data: Object.values(dwellBins), backgroundColor: '#fbbf24' }] }, options: { responsive: true } }); }
     const overdueCont = filtered.filter(c => !['LOADED_VESSEL', 'OUT_OF_PORT'].includes(c.status) && freeDaysLeft(c) < 0);
     document.getElementById('rpt-overdue-tbody').innerHTML = overdueCont.map(c => `<tr><td>${c.id}</td><td>${c.line}</td><td>${c.vessel}</td><td>${c.source}</td><td>${badge(c.status)}</td><td>${c.yard || '—'}</td><td>${getFreeTimeDays(c.source)}d</td><td>${dwellHours(c).toFixed(1)}h</td><td class="text-danger">${Math.abs(freeDaysLeft(c)).toFixed(1)}h</td></tr>`).join('') || '<tr><td colspan="9">No overdue containers</td></tr>';
     const shutoutReasons = {}; DB.shutouts.forEach(s => shutoutReasons[s.reason] = (shutoutReasons[s.reason] || 0) + 1);
-    const ctxShut = document.getElementById('chartShutout')?.getContext('2d'); if (ctxShut) { if (reportCharts.shutout) reportCharts.shutout.destroy(); reportCharts.shutout = new Chart(ctxShut, { type: 'pie', data: { labels: Object.keys(shutoutReasons), datasets: [{ data: Object.values(shutoutReasons), backgroundColor: ['#b3524f', '#c9922b', '#7c8db5', '#2f9e63', '#4a7bab'] }] }, options: { responsive: true } }); }
+    const ctxShut = document.getElementById('chartShutout')?.getContext('2d'); if (ctxShut) { if (reportCharts.shutout) reportCharts.shutout.destroy(); reportCharts.shutout = new Chart(ctxShut, { type: 'pie', data: { labels: Object.keys(shutoutReasons), datasets: [{ data: Object.values(shutoutReasons), backgroundColor: ['#fb7185', '#fbbf24', '#a78bfa', '#34d399', '#38bdf8'] }] }, options: { responsive: true } }); }
     document.getElementById('shutoutStatsRpt').innerHTML = `<div class="info-row"><span>Total Shutouts</span><span class="font-bold text-danger">${DB.shutouts.length}</span></div><div class="info-row"><span>Unique Containers</span><span>${new Set(DB.shutouts.map(s => s.containerId)).size}</span></div>`;
     document.getElementById('rpt-shutout-tbody').innerHTML = DB.shutouts.slice(0, 100).map(s => `<tr><td>${s.containerId}</td><td>${s.line}</td><td>${s.vessel}</td><td>${s.voyage}</td><td>${s.reason}</td><td>${s.clerk}</td><td>${s.nextAction}</td><td>${new Date(s.shutoutAt).toLocaleString()}</td></tr>`).join('');
     const icdCont = DB.containers.filter(c => c.source === 'ICD'); const icdStatus = { PREADVISED: 0, ON_WAGON: 0, RECEIVED_SGR: 0, GATED_IN: 0, OUT_OF_PORT: 0 }; icdCont.forEach(c => icdStatus[c.status] = (icdStatus[c.status] || 0) + 1);
     document.getElementById('icdTable').innerHTML = Object.entries(icdStatus).map(([s, n]) => `<div class="info-row"><span>${s.replace(/_/g, ' ')}</span><span class="font-bold">${n}</span></div>`).join('');
     document.getElementById('rpt-sgr-tbody').innerHTML = icdCont.slice(0, 100).map(c => `<tr><td>${c.id}</td><td>${c.line}</td><td>${c.type}</td><td>${badge(c.status)}</td><td>${c.wagon || '—'}</td><td>${c.yard || '—'}</td><td>${dwellHours(c).toFixed(1)}h</td><td>${freeTimeDisplay(c)}</td></tr>`).join('');
     const impStatusCounts = { VESSEL_DISCHARGED: 0, AT_TAG_MASTER: 0, RECEIVED_YARD: 0, OFFLOADED_RTG: 0, RELEASED_OUT: 0 }; ImportDB.containers.forEach(c => impStatusCounts[c.status]++);
-    const ctxImpStatus = document.getElementById('rptImportStatus')?.getContext('2d'); if (ctxImpStatus) { if (reportCharts.impStatus) reportCharts.impStatus.destroy(); reportCharts.impStatus = new Chart(ctxImpStatus, { type: 'doughnut', data: { labels: Object.keys(impStatusCounts).map(s => IMP_LABELS[s]), datasets: [{ data: Object.values(impStatusCounts), backgroundColor: ['#3d6690', '#7c8db5', '#2f9e63', '#c9922b', '#b3524f'] }] }, options: { responsive: true } }); }
+    const ctxImpStatus = document.getElementById('rptImportStatus')?.getContext('2d'); if (ctxImpStatus) { if (reportCharts.impStatus) reportCharts.impStatus.destroy(); reportCharts.impStatus = new Chart(ctxImpStatus, { type: 'doughnut', data: { labels: Object.keys(impStatusCounts).map(s => IMP_LABELS[s]), datasets: [{ data: Object.values(impStatusCounts), backgroundColor: ['#0ea5e9', '#a78bfa', '#34d399', '#fbbf24', '#fb7185'] }] }, options: { responsive: true } }); }
     const impLineCounts = {}; ImportDB.containers.forEach(c => impLineCounts[c.line] = (impLineCounts[c.line] || 0) + 1);
-    const ctxImpLine = document.getElementById('rptImportLine')?.getContext('2d'); if (ctxImpLine) { if (reportCharts.impLine) reportCharts.impLine.destroy(); reportCharts.impLine = new Chart(ctxImpLine, { type: 'bar', data: { labels: Object.keys(impLineCounts), datasets: [{ label: 'Containers', data: Object.values(impLineCounts), backgroundColor: '#4a7bab' }] }, options: { responsive: true } }); }
+    const ctxImpLine = document.getElementById('rptImportLine')?.getContext('2d'); if (ctxImpLine) { if (reportCharts.impLine) reportCharts.impLine.destroy(); reportCharts.impLine = new Chart(ctxImpLine, { type: 'bar', data: { labels: Object.keys(impLineCounts), datasets: [{ label: 'Containers', data: Object.values(impLineCounts), backgroundColor: '#38bdf8' }] }, options: { responsive: true } }); }
     document.getElementById('rpt-import-tbody').innerHTML = ImportDB.containers.slice(0, 100).map(c => `<tr><td>${c.id}</td><td>${c.line}</td><td>${c.vessel}</td><td>${c.type}</td><td>${impBadge(c.status)}</td><td>${c.yardBlock || '—'}</td><td>${c.receivingClerk || '—'}</td><td>${c.rtgOperator || '—'}</td><td>${c.releaseClerk || '—'}</td><td>${c.truckPlate || '—'}</td><td>${dwellImport(c).toFixed(1)}h</td></tr>`).join('');
     const randomReasons = {}; DB.randomLoads.forEach(r => randomReasons[r.reason] = (randomReasons[r.reason] || 0) + 1);
-    const ctxRandom = document.getElementById('chartRandom')?.getContext('2d'); if (ctxRandom) { if (reportCharts.random) reportCharts.random.destroy(); reportCharts.random = new Chart(ctxRandom, { type: 'pie', data: { labels: Object.keys(randomReasons), datasets: [{ data: Object.values(randomReasons), backgroundColor: ['#c9922b', '#4a7bab', '#7c8db5', '#2f9e63', '#b3524f', '#f97316', '#94a3b8'] }] }, options: { responsive: true } }); }
+    const ctxRandom = document.getElementById('chartRandom')?.getContext('2d'); if (ctxRandom) { if (reportCharts.random) reportCharts.random.destroy(); reportCharts.random = new Chart(ctxRandom, { type: 'pie', data: { labels: Object.keys(randomReasons), datasets: [{ data: Object.values(randomReasons), backgroundColor: ['#fbbf24', '#38bdf8', '#a78bfa', '#34d399', '#fb7185', '#f97316', '#94a3b8'] }] }, options: { responsive: true } }); }
     document.getElementById('randomStatsRpt').innerHTML = `<div class="info-row"><span>Total Random Loads</span><span class="font-bold text-gold">${DB.randomLoads.length}</span></div><div class="info-row"><span>Unique Containers</span><span class="font-bold">${new Set(DB.randomLoads.map(r => r.containerId)).size}</span></div><div class="info-row"><span>Unique Vessels Involved</span><span class="font-bold">${new Set(DB.randomLoads.map(r => r.actualVessel)).size}</span></div>`;
     document.getElementById('rpt-random-tbody').innerHTML = DB.randomLoads.slice(0, 100).map(r => `<tr><td>${r.containerId}</td><td>${r.line || '—'}</td><td>${r.designatedVessel || '—'}</td><td>${r.actualVessel || '—'}</td><td>${r.reason || '—'}</td><td>${r.clerk || '—'}</td><td>${new Date(r.recordedAt).toLocaleString()}</td></tr>`).join('') || '<tr><td colspan="7">No random loading records</td></tr>';
 }
@@ -1418,13 +1559,13 @@ document.querySelectorAll('.nav-item, .mob-item').forEach(el => {
         if (tab === 'vessel-to-yard') renderVesselYardTable();
         if (tab === 'yard') renderYardBlocks();
         if (tab === 'vessel') renderVessel();
+        if (tab === 'approvals') renderApprovals();
         populateAllDropdowns();
     });
 });
 
 window.addEventListener('load', () => {
-    loadAll();
-    document.getElementById('loginUser').focus();
+    showLanding();
     const dz = document.getElementById('bulkDZ');
     if (dz) { dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); }); dz.addEventListener('dragleave', () => dz.classList.remove('drag-over')); dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); const file = e.dataTransfer.files[0]; if (file && file.name.endsWith('.csv')) { handleBulkFile({ target: { files: [file] } }); } else toast('Please drop a CSV file', 'error'); }); }
     const impDz = document.getElementById('importBulkDZ');

@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terminal TMS · Container Terminal Operations</title>
+    <title>TMS ·  Container Terminal · v11</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
@@ -15,21 +15,213 @@
 </head>
 <body>
 
-    <!-- ════ LOGIN ════ -->
-    <div id="loginScreen">
-        <div class="login-card">
+    <!-- ════ LANDING PAGE ════ -->
+    <div id="landingScreen">
+
+        <nav class="lp-nav">
+            <div class="lp-nav-inner">
+                <div class="lp-brand"><span class="lp-brand-emblem">⚓</span> Terminal TMS</div>
+                <div class="lp-nav-links">
+                    <a href="#lp-overview">Overview</a>
+                    <a href="#lp-flow">How it works</a>
+                    <a href="#lp-benefits">Benefits</a>
+                    <a href="#lp-security">Security</a>
+                    <a href="#lp-roles">Roles</a>
+                </div>
+                <button class="lp-btn-portal" onclick="showAuth('signin')">Access Portal →</button>
+            </div>
+        </nav>
+
+        <!-- HERO -->
+        <header class="lp-hero">
+            <div class="lp-hero-inner">
+                <div class="lp-eyebrow"><span class="dot"></span> Live · Mombasa Container Terminal</div>
+                <h1 class="lp-h1">Every container.<br>One record.<br><span class="lp-h1-accent">Zero guesswork.</span></h1>
+                <p class="lp-hero-sub">Terminal TMS is the system of record for gate‑in, yard, key site, SGR rail and vessel loading operations at the Kenya Ports Authority Mombasa Container Terminal — built so a container's status is never a matter of who you called last.</p>
+                <div class="lp-hero-cta">
+                    <button class="lp-btn-primary" onclick="showAuth('signin')">Access Portal</button>
+                    <a href="#lp-flow" class="lp-btn-ghost">See how it works ↓</a>
+                </div>
+                <div class="lp-stat-strip">
+                    <div class="lp-stat"><strong>17</strong><span>Operational modules</span></div>
+                    <div class="lp-stat"><strong>Real‑time</strong><span>Cloud sync</span></div>
+                    <div class="lp-stat"><strong>100%</strong><span>Actions audited</span></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- OVERVIEW -->
+        <section class="lp-section" id="lp-overview">
+            <div class="lp-section-inner">
+                <div class="lp-eyebrow-sm">System overview</div>
+                <h2 class="lp-h2">A single source of truth for every container movement</h2>
+                <p class="lp-body">Gate clerks, yard controllers, key site operators, SGR rail staff and vessel loading teams have historically worked from separate log books, radios and memory. Terminal TMS gives every role the same live container record — checked once, trusted at every stage downstream.</p>
+                <div class="lp-feature-grid">
+                    <div class="lp-feature"><span class="lp-feature-ic">📋</span><span>Pre‑advice &amp; Gate In</span></div>
+                    <div class="lp-feature"><span class="lp-feature-ic">🏗️</span><span>Yard &amp; Key Site staging</span></div>
+                    <div class="lp-feature"><span class="lp-feature-ic">🚂</span><span>SGR Rail integration</span></div>
+                    <div class="lp-feature"><span class="lp-feature-ic">🛳️</span><span>Vessel Loading &amp; random‑load detection</span></div>
+                    <div class="lp-feature"><span class="lp-feature-ic">↔️</span><span>Shifting &amp; Shutout tracking</span></div>
+                    <div class="lp-feature"><span class="lp-feature-ic">📊</span><span>Reports &amp; compliance exports</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section class="lp-section lp-section-alt" id="lp-flow">
+            <div class="lp-section-inner">
+                <div class="lp-eyebrow-sm">Ship to gate</div>
+                <h2 class="lp-h2">How a container moves through the system</h2>
+                <p class="lp-body">Five stages, one continuous record — nothing is re‑entered or re‑checked between them.</p>
+                <div class="lp-flow-grid">
+                    <div class="lp-flow-step"><div class="lp-flow-num">01</div><h3>Pre‑advice</h3><p>Container is registered before it arrives, so gate clerks aren't creating records from scratch at the barrier.</p></div>
+                    <div class="lp-flow-step"><div class="lp-flow-num">02</div><h3>Gate In</h3><p>Plate, transporter and yard block captured once; a position slip is issued automatically.</p></div>
+                    <div class="lp-flow-step"><div class="lp-flow-num">03</div><h3>Yard / Key Site / SGR</h3><p>Held, staged or received off rail — location and clerk logged the moment it happens.</p></div>
+                    <div class="lp-flow-step"><div class="lp-flow-num">04</div><h3>Vessel Loading</h3><p>Loaded against its designated vessel; if it's actually loaded on a different one, a reason is required before the record closes.</p></div>
+                    <div class="lp-flow-step"><div class="lp-flow-num">05</div><h3>Departed / Reported</h3><p>Every movement is already logged — reporting is an export, not a reconstruction.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BENEFITS -->
+        <section class="lp-section" id="lp-benefits">
+            <div class="lp-section-inner">
+                <div class="lp-eyebrow-sm">Why it matters</div>
+                <h2 class="lp-h2">Benefits</h2>
+                <div class="lp-card-grid">
+                    <div class="lp-card"><span class="lp-card-ic">👁️</span><h3>Full visibility</h3><p>Dashboard, dwell‑time and vessel‑loading reports show exactly where every container sits, without radio calls to reconstruct it.</p></div>
+                    <div class="lp-card"><span class="lp-card-ic">🎲</span><h3>Fewer loading errors</h3><p>When a container is loaded onto a vessel other than the one it was pre‑advised for, the system requires a documented reason — nothing slips through silently.</p></div>
+                    <div class="lp-card"><span class="lp-card-ic">⏱️</span><h3>Faster turnaround</h3><p>Gate, yard and vessel loading share one record, so nothing is re‑entered or re‑checked at each stage.</p></div>
+                    <div class="lp-card"><span class="lp-card-ic">🧾</span><h3>Audit‑ready by default</h3><p>Every gate‑in, shift, shutout and load is logged with a timestamp and the clerk who recorded it.</p></div>
+                    <div class="lp-card"><span class="lp-card-ic">🔁</span><h3>Safe for multiple terminals</h3><p>Slip, shift, shutout and random‑load numbers are issued centrally, so two clerks working at once never collide.</p></div>
+                    <div class="lp-card"><span class="lp-card-ic">📡</span><h3>Cloud‑synced, offline‑resilient</h3><p>Actions save instantly to your device and sync to the central system in the background, even on a shaky connection.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECURITY -->
+        <section class="lp-section lp-section-alt" id="lp-security">
+            <div class="lp-section-inner">
+                <div class="lp-eyebrow-sm">Trust</div>
+                <h2 class="lp-h2">Security &amp; safeguards</h2>
+                <p class="lp-body">Access control is enforced by the database, not the interface.</p>
+                <div class="lp-card-grid">
+                    <div class="lp-card"><span class="lp-card-ic">🔐</span><h3>Row‑level security</h3><p>Every table is governed by database‑level policy, not just by what the interface happens to show.</p></div>
+                    <div class="lp-card"><span class="lp-card-ic">✅</span><h3>Approval‑gated accounts</h3><p>Anyone can request an account, but every new registration sits pending until an administrator reviews and approves it.</p></div>
+                    <div class="lp-card"><span class="lp-card-ic">🧭</span><h3>Role‑based access</h3><p>Thirteen distinct account types — from KPA clerks to transporters and clearing agents — so each account reflects who actually holds it.</p></div>
+                    <div class="lp-card"><span class="lp-card-ic">📜</span><h3>Full audit trail</h3><p>Every action is written to an append‑only log, attributed to the account that performed it, and never silently overwritten.</p></div>
+                    <div class="lp-card"><span class="lp-card-ic">🔑</span><h3>Session‑based authentication</h3><p>Sign‑in is backed by real authentication with persisted sessions — no shared logins, no role chosen client‑side and trusted on its own.</p></div>
+                    <div class="lp-card"><span class="lp-card-ic">🧮</span><h3>Atomic record numbering</h3><p>Position slip, shift, shutout and random‑load IDs are generated centrally, so records can never collide or be duplicated.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ROLES -->
+        <section class="lp-section" id="lp-roles">
+            <div class="lp-section-inner">
+                <div class="lp-eyebrow-sm">Built for the terminal</div>
+                <h2 class="lp-h2">Account types</h2>
+                <p class="lp-body">Every account sees the same system, provisioned with a role that reflects who actually holds it. Choose yours when you register.</p>
+                <div class="lp-roles-grid">
+                    <div class="lp-role"><strong>KPA Employee</strong><span>General Kenya Ports Authority staff access.</span></div>
+                    <div class="lp-role"><strong>KPA Clerk</strong><span>Gate, yard and documentation processing.</span></div>
+                    <div class="lp-role"><strong>KPA Dispatcher</strong><span>Coordinates vessel and yard movements.</span></div>
+                    <div class="lp-role"><strong>KPA Machine Operator</strong><span>RTG, crane and yard equipment operations.</span></div>
+                    <div class="lp-role"><strong>KPA Supervisor</strong><span>Oversight across gate, yard and vessel operations.</span></div>
+                    <div class="lp-role"><strong>Terminal Supervisor</strong><span>Full operational oversight of terminal activity.</span></div>
+                    <div class="lp-role"><strong>Yard Manager</strong><span>Yard block allocation and capacity management.</span></div>
+                    <div class="lp-role"><strong>Port User</strong><span>General port stakeholder access.</span></div>
+                    <div class="lp-role"><strong>Transporter</strong><span>Truck and haulage company access for gate movements.</span></div>
+                    <div class="lp-role"><strong>Depot Operator</strong><span>Off‑dock depot and empty container handling.</span></div>
+                    <div class="lp-role"><strong>Agent / Clerk</strong><span>Shipping line or forwarding agency clerk access.</span></div>
+                    <div class="lp-role"><strong>Clearing Agent</strong><span>Customs clearing and forwarding access.</span></div>
+                </div>
+                <p class="lp-roles-note">Administrator accounts are provisioned directly by Kenya Ports Authority IT and are not available through self‑registration.</p>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="lp-cta">
+            <div class="lp-cta-inner">
+                <h2>Already have an account?</h2>
+                <p>Sign in to access the terminal management portal.</p>
+                <button class="lp-btn-primary" onclick="showAuth('signin')">Access Portal</button>
+            </div>
+        </section>
+
+        <footer class="lp-footer">
+            <div class="lp-footer-inner">
+                <div class="lp-brand"><span class="lp-brand-emblem">⚓</span> Terminal TMS</div>
+                <div class="lp-footer-text">
+                    <div>Kenya Ports Authority · info@kpa.go.ke · +254 41 222 5143</div>
+                    <div>Authorized personnel and registered corridor partners only. All activity is logged and audited.</div>
+                    <div>v11.0 Production · Mombasa MCT</div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ════ AUTH (SIGN IN / CREATE ACCOUNT) ════ -->
+    <div id="authScreen" class="hidden">
+
+        <!-- SIGN IN -->
+        <div class="login-card" id="signInPanel">
+            <a href="#" class="auth-back" onclick="showLanding();return false;">← Back to site</a>
             <div class="login-logo">
                 <div class="login-emblem">⚓</div>
                 <h1>Terminal TMS</h1>
                 <p>Mombasa Container Terminal · Management System</p>
                 <div class="sys-badge"><span class="dot"></span> System Online · v11.0 Production</div>
             </div>
-            <div class="login-field"><label>Username</label><input type="text" id="loginUser" placeholder="Enter username or email" autocomplete="username"></div>
+            <div class="login-field"><label>Username or Email</label><input type="text" id="loginUser" placeholder="Enter username or email" autocomplete="username"></div>
             <div class="login-field"><label>Password</label><input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password"></div>
             <button class="btn-login" onclick="doLogin()">Sign In to Terminal TMS</button>
             <div id="loginError">⚠️ Invalid credentials. Access denied.</div>
+            <div class="auth-switch">New here? <a href="#" onclick="showAuth('signup');return false;">Create an account</a></div>
             <div class="login-footer"><div>Kenya Ports Authority · info@kpa.go.ke</div><div>Authorized personnel only · All activity is logged &amp; audited</div></div>
         </div>
+
+        <!-- SIGN UP -->
+        <div class="login-card hidden" id="signUpPanel">
+            <a href="#" class="auth-back" onclick="showAuth('signin');return false;">← Back to sign in</a>
+            <div class="login-logo">
+                <div class="login-emblem">⚓</div>
+                <h1>Create Account</h1>
+                <p>Register for Terminal TMS portal access</p>
+            </div>
+            <div class="login-field"><label>Full Name</label><input type="text" id="suFullName" placeholder="Enter your full name" autocomplete="name"></div>
+            <div class="login-field"><label>Email</label><input type="email" id="suEmail" placeholder="you@example.com" autocomplete="email"></div>
+            <div class="login-field"><label>Phone <span class="opt">(optional)</span></label><input type="tel" id="suPhone" placeholder="e.g. 0712 345 678" autocomplete="tel"></div>
+            <div class="login-field">
+                <label>I am registering as…</label>
+                <select id="suRole" onchange="toggleSignupOrgField()">
+                    <option value="">Select a role</option>
+                    <optgroup label="Kenya Ports Authority">
+                        <option value="kpa_employee">KPA Employee</option>
+                        <option value="kpa_clerk">KPA Clerk</option>
+                        <option value="kpa_dispatcher">KPA Dispatcher</option>
+                        <option value="kpa_machine_operator">KPA Machine Operator</option>
+                        <option value="kpa_supervisor">KPA Supervisor</option>
+                        <option value="terminal_supervisor">Terminal Supervisor</option>
+                        <option value="yard_manager">Yard Manager</option>
+                    </optgroup>
+                    <optgroup label="External / Corridor Partners">
+                        <option value="port_user">Port User</option>
+                        <option value="transporter">Transporter</option>
+                        <option value="depot_operator">Depot Operator</option>
+                        <option value="agent_clerk">Agent / Clerk</option>
+                        <option value="clearing_agent">Clearing Agent</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="login-field hidden" id="suOrgField"><label>Organization / Company</label><input type="text" id="suOrg" placeholder="Company or organization name"></div>
+            <div class="login-field"><label>Password</label><input type="password" id="suPass" placeholder="Create a password" autocomplete="new-password"></div>
+            <div class="login-field"><label>Confirm Password</label><input type="password" id="suPass2" placeholder="Re‑enter password" autocomplete="new-password"></div>
+            <button class="btn-login" onclick="doSignup()">Create Account</button>
+            <div id="signupMsg"></div>
+            <p class="auth-note">Every new account is reviewed by an administrator before it can sign in — you'll be notified once it's approved.</p>
+        </div>
+
     </div>
 
     <!-- ════ APP SHELL ════ -->
@@ -38,7 +230,7 @@
         <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sb-logo">
-                <div class="sb-logo-kpa"><div style="width:40px;height:40px;border-radius:10px;background:rgba(74,123,171,0.12);display:flex;align-items:center;justify-content:center;font-size:20px">⚓</div></div>
+                <div class="sb-logo-kpa"><div style="width:40px;height:40px;border-radius:10px;background:rgba(56,189,248,0.12);display:flex;align-items:center;justify-content:center;font-size:20px">⚓</div></div>
                 <div class="sb-brand">Terminal TMS</div>
                 <div class="sb-sub">Kenya Ports Authority · Terminal Control</div>
                 <div class="sb-pill"><span class="dot"></span> Live · Mombasa MCT</div>
@@ -66,6 +258,8 @@
             <div class="sb-section">Intelligence</div>
             <div class="nav-item" data-tab="reports"><span class="ni">📈</span>Reports &amp; Analytics</div>
             <div class="nav-item" data-tab="logs"><span class="ni">📜</span>Audit Logs</div>
+            <div class="sb-section hidden" id="sbAdminSection">Administration</div>
+            <div class="nav-item hidden" id="navApprovals" data-tab="approvals"><span class="ni">🛂</span>User Approvals <span class="nav-badge" id="nb-approvals">0</span></div>
             <div class="sb-user">
                 <div class="sb-user-info">
                     <div class="sb-avatar" id="sbAvatar">A</div>
@@ -236,7 +430,7 @@
                         <button class="btn btn-primary" onclick="createContainer()">➕ Save Pre-Advice</button>
                         <button class="btn btn-secondary" onclick="clearPAForm()">✕ Clear Form</button>
                     </div>
-                    <div id="pa-validation" class="mt-2 text-sm" style="color:#b3524f"></div>
+                    <div id="pa-validation" class="mt-2 text-sm" style="color:#fb7185"></div>
                 </div>
             </div>
 
@@ -271,7 +465,7 @@
                             <label>Container ID *</label>
                             <select id="g-id" onchange="gateAutofill()"><option value="">— Select Pre-Advised Container —</option></select>
                         </div>
-                        <div id="g-autofill" class="hidden mb-2 text-sm" style="background:rgba(74,123,171,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(74,123,171,0.16)"></div>
+                        <div id="g-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
                         <div class="form-group mb-2">
                             <label>Gate *</label>
                             <select id="g-gate"><option value="Gate18">Gate 18</option><option value="Gate24">Gate 24</option></select>
@@ -342,7 +536,7 @@
                             <label>Container ID *</label>
                             <select id="vy-id" onchange="vyAutofill()"><option value="">— Select Pre-Advised (Vessel) Container —</option></select>
                         </div>
-                        <div id="vy-autofill" class="hidden mb-2 text-sm" style="background:rgba(74,123,171,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(74,123,171,0.16)"></div>
+                        <div id="vy-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
                         <div class="form-group mb-2">
                             <label>Yard / Block *</label>
                             <select id="vy-yard">
@@ -380,7 +574,7 @@
                             <label>Container ID *</label>
                             <select id="y-id" onchange="yardAutofill()"><option value="">— Select Container —</option></select>
                         </div>
-                        <div id="y-autofill" class="hidden mb-2 text-sm" style="background:rgba(74,123,171,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(74,123,171,0.16)"></div>
+                        <div id="y-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
                         <div class="form-group mb-2">
                             <label>Action</label>
                             <select id="y-action" onchange="toggleYardVesselFields()">
@@ -394,7 +588,7 @@
                             <div class="form-group mb-2"><label>Actual Voyage</label><input id="y-actual-voyage" placeholder="Voyage (if different)"></div>
                             <div class="form-group mb-2"><label>Loading Clerk</label><input id="y-clerk" placeholder="Clerk name"></div>
                         </div>
-                        <div id="y-random-block" class="hidden mb-2" style="background:rgba(185,112,46,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(185,112,46,0.2)">
+                        <div id="y-random-block" class="hidden mb-2" style="background:rgba(251,146,60,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(251,146,60,0.2)">
                             <div class="text-xs" style="color:var(--orange);font-weight:700;margin-bottom:0.5rem">🎲 RANDOM LOADING DETECTED — actual vessel differs from designated. A reason is required.</div>
                             <div class="form-group">
                                 <label>Random Loading Reason *</label>
@@ -431,7 +625,7 @@
                             <label>Container ID *</label>
                             <select id="sh-id" onchange="shiftAutofill()"><option value="">— Select Container —</option></select>
                         </div>
-                        <div id="sh-autofill" class="hidden mb-2 text-sm" style="background:rgba(74,123,171,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(74,123,171,0.16)"></div>
+                        <div id="sh-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
                         <div class="form-group mb-2"><label>From Yard / Block (auto-filled)</label><input id="sh-from" readonly style="background:rgba(10,18,35,0.4);cursor:not-allowed"></div>
                         <div class="form-group mb-2">
                             <label>To Yard / Block *</label>
@@ -508,7 +702,7 @@
                             <label>Container ID *</label>
                             <select id="ks-move-id" onchange="keysiteMoveAutofill()"><option value="">— Select Eligible Container —</option></select>
                         </div>
-                        <div id="ks-move-autofill" class="hidden mb-2 text-sm" style="background:rgba(74,123,171,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(74,123,171,0.16)"></div>
+                        <div id="ks-move-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
                         <div class="form-group mb-2"><label>Key Site Bay / Slot</label><input id="ks-bay" placeholder="e.g. KS-A01, BERTH-2-SLOT-04"></div>
                         <div class="form-group mb-2"><label>Vessel (confirm) *</label><input id="ks-vessel" placeholder="Target vessel name" oninput="this.value=this.value.toUpperCase()"></div>
                         <div class="form-group mb-2"><label>Voyage</label><input id="ks-voyage" placeholder="Voyage number"></div>
@@ -524,10 +718,10 @@
                             <label>Container ID (at Key Site) *</label>
                             <select id="ks-load-id" onchange="keysiteLoadAutofill()"><option value="">— Select Key Site Container —</option></select>
                         </div>
-                        <div id="ks-load-autofill" class="hidden mb-2 text-sm" style="background:rgba(47,158,99,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(47,158,99,0.16)"></div>
+                        <div id="ks-load-autofill" class="hidden mb-2 text-sm" style="background:rgba(52,211,153,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(52,211,153,0.16)"></div>
                         <div class="form-group mb-2"><label>Actual Vessel Loaded (leave blank if same as designated)</label><input id="ks-load-actual-vessel" placeholder="Designated vessel auto-used if blank" oninput="checkRandomLoadUI('ks-load')"></div>
                         <div class="form-group mb-2"><label>Actual Voyage</label><input id="ks-load-actual-voyage" placeholder="Voyage (if different)"></div>
-                        <div id="ks-load-random-block" class="hidden mb-2" style="background:rgba(185,112,46,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(185,112,46,0.2)">
+                        <div id="ks-load-random-block" class="hidden mb-2" style="background:rgba(251,146,60,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(251,146,60,0.2)">
                             <div class="text-xs" style="color:var(--orange);font-weight:700;margin-bottom:0.5rem">🎲 RANDOM LOADING DETECTED — actual vessel differs from designated. A reason is required.</div>
                             <div class="form-group">
                                 <label>Random Loading Reason *</label>
@@ -571,10 +765,10 @@
                             <label>Container ID *</label>
                             <select id="v-id" onchange="vesselAutofill()"><option value="">— Select Container —</option></select>
                         </div>
-                        <div id="v-autofill" class="hidden mb-2 text-sm" style="background:rgba(74,123,171,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(74,123,171,0.16)"></div>
+                        <div id="v-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
                         <div class="form-group mb-2"><label>Actual Vessel Loaded (leave blank if same as designated)</label><input id="v-actual-vessel" placeholder="Designated vessel auto-used if blank" oninput="checkRandomLoadUI('v')"></div>
                         <div class="form-group mb-2"><label>Actual Voyage</label><input id="v-actual-voyage" placeholder="Voyage (if different)"></div>
-                        <div id="v-random-block" class="hidden mb-2" style="background:rgba(185,112,46,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(185,112,46,0.2)">
+                        <div id="v-random-block" class="hidden mb-2" style="background:rgba(251,146,60,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(251,146,60,0.2)">
                             <div class="text-xs" style="color:var(--orange);font-weight:700;margin-bottom:0.5rem">🎲 RANDOM LOADING DETECTED — actual vessel differs from designated. A reason is required.</div>
                             <div class="form-group">
                                 <label>Random Loading Reason *</label>
@@ -617,7 +811,7 @@
                             <label>Container ID *</label>
                             <select id="so-id" onchange="shutoutAutofill()"><option value="">— Select Container (Key Site / Gated In) —</option></select>
                         </div>
-                        <div id="so-autofill" class="hidden mb-2 text-sm" style="background:rgba(179,82,79,0.05);padding:0.75rem;border-radius:9px;border:1px solid rgba(179,82,79,0.18)"></div>
+                        <div id="so-autofill" class="hidden mb-2 text-sm" style="background:rgba(251,113,133,0.05);padding:0.75rem;border-radius:9px;border:1px solid rgba(251,113,133,0.18)"></div>
                         <div class="form-group mb-2"><label>Vessel (Missed)</label><input id="so-vessel" readonly style="background:rgba(10,18,35,0.4)"></div>
                         <div class="form-group mb-2"><label>Voyage</label><input id="so-voyage" readonly style="background:rgba(10,18,35,0.4)"></div>
                         <div class="form-group mb-2">
@@ -684,7 +878,7 @@
                             <label>Container ID (Loaded) *</label>
                             <select id="rl-id" onchange="randomLoadAutofill()"><option value="">— Select Loaded Container —</option></select>
                         </div>
-                        <div id="rl-autofill" class="hidden mb-2 text-sm" style="background:rgba(124,141,181,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(124,141,181,0.2)"></div>
+                        <div id="rl-autofill" class="hidden mb-2 text-sm" style="background:rgba(167,139,250,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(167,139,250,0.2)"></div>
                         <div class="form-group mb-2"><label>Actual Vessel Loaded *</label><input id="rl-actual-vessel" placeholder="Vessel actually loaded onto" oninput="this.value=this.value.toUpperCase()"></div>
                         <div class="form-group mb-2"><label>Actual Voyage</label><input id="rl-actual-voyage" placeholder="Voyage number"></div>
                         <div class="form-group mb-2">
@@ -965,6 +1159,37 @@
                     <div class="btn-group"><button class="btn btn-secondary btn-sm" onclick="exportLogsCSV()">📥 Export Logs</button><button class="btn btn-danger btn-sm" onclick="clearLogs()">🗑️ Clear Logs</button></div>
                 </div>
                 <div class="card"><div class="scroll-table" style="max-height:520px;background:rgba(6,11,22,0.5);border-radius:9px;padding:1rem" id="logsContent"></div></div>
+            </div>
+
+            <!-- ─── USER APPROVALS (admin only) ─── -->
+            <div class="tab-pane" id="tab-approvals">
+                <div class="page-hdr">
+                    <div><h2>User Approvals</h2><div class="sub">Review and manage portal accounts — every self-registered user starts here</div></div>
+                    <button class="btn btn-sm btn-secondary" onclick="renderApprovals()">🔄 Refresh</button>
+                </div>
+                <div class="stat-grid mb-3" id="approvalsStats"></div>
+                <div class="card mb-3">
+                    <div class="flex items-center gap-2" style="flex-wrap:wrap">
+                        <input id="approvalsSearch" placeholder="Search name, email, organization…" oninput="renderApprovals()" style="flex:1;min-width:220px">
+                        <select id="approvalsStatusFilter" onchange="renderApprovals()">
+                            <option value="">All statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="suspended">Suspended</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">👥 Accounts</div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Organization</th><th>Phone</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead>
+                            <tbody id="approvalsBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="mt-2 text-xs text-muted" id="approvalsCount"></div>
+                </div>
             </div>
 
         </main>
