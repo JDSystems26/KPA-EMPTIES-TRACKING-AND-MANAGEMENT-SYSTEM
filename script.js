@@ -34,35 +34,81 @@ function tsAddOptions(id, opts) {
     }
 }
 
-// ═══ AUTH ═══
-const USERS = { Admin: '0101', Clerk: '1234', Supervisor: '5678', Manager: '9999' };
+// ═══ AUTH — Supabase Auth (email/password, looked up via username) ═══
 let currentUser = null;
-function doLogin() {
+let currentProfile = null;
+
+function enterApp(profile) {
+    currentProfile = profile;
+    currentUser = profile.full_name || profile.username || profile.email;
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('appShell').style.display = 'grid';
+    document.getElementById('sbUserName').textContent = currentUser;
+    document.getElementById('sbAvatar').textContent = currentUser[0].toUpperCase();
+    loadAll();
+    toast(`👋 Welcome, ${currentUser}! Mombasa MCT Terminal TMS`, 'success');
+    document.getElementById('loginError').style.display = 'none';
+    initAllSearchableDropdowns();
+}
+
+async function fetchOwnProfile() {
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) return null;
+    const { data, error } = await sb.from('profiles').select('id, email, full_name, role, username').eq('id', user.id).single();
+    if (error || !data) return null;
+    return data;
+}
+
+async function doLogin() {
+    const loginBtn = document.querySelector('.btn-login');
     const u = document.getElementById('loginUser').value.trim();
     const p = document.getElementById('loginPass').value.trim();
-    if (USERS[u] && USERS[u] === p) {
-        currentUser = u;
-        document.getElementById('loginScreen').classList.add('hidden');
-        document.getElementById('appShell').style.display = 'grid';
-        document.getElementById('sbUserName').textContent = u;
-        document.getElementById('sbAvatar').textContent = u[0];
-        loadAll();
-        toast(`👋 Welcome, ${u}! Mombasa MCT Terminal TMS`, 'success');
-        document.getElementById('loginError').style.display = 'none';
-        initAllSearchableDropdowns();
-    } else {
-        document.getElementById('loginError').style.display = 'block';
+    const errEl = document.getElementById('loginError');
+    if (!u || !p) { errEl.textContent = '⚠️ Enter username/email and password.'; errEl.style.display = 'block'; return; }
+    if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = 'Signing in…'; }
+    try {
+        let email = u;
+        if (!u.includes('@')) {
+            const { data: lookedUpEmail, error: lookupErr } = await sb.rpc('get_email_for_username', { p_username: u.toLowerCase() });
+            if (lookupErr || !lookedUpEmail) throw new Error('Invalid credentials');
+            email = lookedUpEmail;
+        }
+        const { data: authData, error: authErr } = await sb.auth.signInWithPassword({ email, password: p });
+        if (authErr || !authData?.user) throw new Error('Invalid credentials');
+        const profile = await fetchOwnProfile();
+        if (!profile) throw new Error('No profile found for this account');
+        document.getElementById('loginPass').value = '';
+        enterApp(profile);
+    } catch (e) {
+        errEl.textContent = '⚠️ Invalid credentials. Access denied.';
+        errEl.style.display = 'block';
         document.getElementById('loginPass').value = '';
         document.getElementById('loginPass').focus();
+    } finally {
+        if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = 'Sign In to Terminal TMS'; }
     }
 }
-function doLogout() {
+
+async function doLogout() {
+    await sb.auth.signOut();
     currentUser = null;
+    currentProfile = null;
     document.getElementById('appShell').style.display = 'none';
     document.getElementById('loginScreen').classList.remove('hidden');
     document.getElementById('loginUser').value = '';
     document.getElementById('loginPass').value = '';
     document.getElementById('loginError').style.display = 'none';
+}
+
+// Restore an existing Supabase session on page load (refresh without re-login).
+// Called later, once `sb` (the Supabase client) has been initialized below.
+async function restoreSession() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+        const profile = await fetchOwnProfile();
+        if (profile) enterApp(profile);
+        else await sb.auth.signOut();
+    }
 }
 document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 document.getElementById('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginPass').focus(); });
@@ -71,6 +117,7 @@ document.getElementById('loginUser').addEventListener('keydown', e => { if (e.ke
 const SUPABASE_URL = 'https://ferxctlwemnxygacybku.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_bJ9D_4Npb8nOGleqIK2ICw_S6YS3D5a';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+restoreSession();
 
 const DB = { containers: [], logs: [], slips: [], shifts: [], shutouts: [], randomLoads: [] };
 const ImportDB = { containers: [], logs: [] };
