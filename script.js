@@ -82,7 +82,7 @@ async function enterApp(displayName, roleLabel) {
     document.getElementById('sbAdminSection').classList.toggle('hidden', !isAdmin);
     document.getElementById('navApprovals').classList.toggle('hidden', !isAdmin);
     await loadAll();
-    toast(`👋 Welcome, ${displayName}! Mombasa MCT Terminal TMS`, 'success');
+    toast(`👋 Welcome, ${displayName}! ECOMS · Mombasa MCT`, 'success');
     initAllSearchableDropdowns();
 }
 
@@ -193,8 +193,8 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const DB = { containers: [], logs: [], slips: [], shifts: [], shutouts: [], randomLoads: [] };
 const ImportDB = { containers: [], logs: [] };
 let charts = {}, bulkData = [];
-const STORE_KEY = 'KPA_TMS_V10';
-const IMP_STORAGE = 'KPA_TMS_IMP_V10';
+const STORE_KEY = 'KPA_ECOMS_V10';
+const IMP_STORAGE = 'KPA_ECOMS_IMP_V10';
 
 // Explicit column maps for containers/import_containers — any object field not listed here is
 // preserved losslessly in the `extra` jsonb column, so the client model can evolve freely.
