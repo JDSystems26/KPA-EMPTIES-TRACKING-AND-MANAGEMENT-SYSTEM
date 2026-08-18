@@ -15,147 +15,112 @@
 </head>
 <body>
 
-    <!-- ════ LANDING PAGE ════ -->
+    <!-- ════ LANDING PAGE (HOME) ════ -->
     <div id="landingScreen">
 
-        <nav class="lp-nav">
-            <div class="lp-nav-inner">
+        <nav class="site-nav">
+            <div class="site-nav-inner">
                 <div class="lp-brand"><span class="lp-brand-emblem">⚓</span> Terminal TMS</div>
-                <div class="lp-nav-links">
-                    <a href="#lp-overview">Overview</a>
-                    <a href="#lp-flow">How it works</a>
-                    <a href="#lp-benefits">Benefits</a>
-                    <a href="#lp-security">Security</a>
-                    <a href="#lp-roles">Roles</a>
+                <div class="site-nav-links">
+                    <a href="index.html" class="is-active">Home</a>
+                    <a href="system.html">System</a>
+                    <a href="security.html">Security</a>
+                    <a href="contact.html">Contact</a>
                 </div>
                 <button class="lp-btn-portal" onclick="showAuth('signin')">Access Portal →</button>
             </div>
         </nav>
 
         <!-- HERO -->
-        <header class="lp-hero">
-            <div class="lp-hero-inner">
-               <!-- <div class="lp-eyebrow"><span class="dot"></span> Live · Mombasa Empty Containers Terminal</div>--
-                <h1 class="lp-h1">Every container.<br>One record.<br><span class="lp-h1-accent">Zero guesswork.</span></h1>-->
-                <p class="lp-hero-sub">Management and tracking system for Empty containers gate‑in, yard, key site, SGR rail and vessel loading operations at Ports Empty Containers Terminal — built so a container's status is never a matter of who you called last.</p>
-                <div class="lp-hero-cta">
-                    <button class="lp-btn-primary" onclick="showAuth('signin')">Access Portal</button>
-                    <a href="#lp-flow" class="lp-btn-ghost">See how it works ↓</a>
-                </div>
-                <div class="lp-stat-strip">
-                    <div class="lp-stat"><strong>17</strong><span>Operational modules</span></div>
-                    <div class="lp-stat"><strong>Real‑time</strong><span>Cloud sync</span></div>
-                    <div class="lp-stat"><strong>100%</strong><span>Actions audited</span></div>
+        <header class="mag-hero">
+            <div class="mag-hero-media" style="background-image:url('https://images.unsplash.com/photo-1759216373394-91146ca977c7?auto=format&amp;fit=crop&amp;w=2400&amp;q=70')"></div>
+            <div class="mag-hero-inner">
+                <div class="mag-kicker">Mombasa MCT &nbsp;·&nbsp; Terminal Operations</div>
+                <h1 class="mag-hero-h1">Every container.<br>One record.<br><em>Zero guesswork.</em></h1>
+                <p class="mag-hero-sub">Management and tracking system for empty‑container gate‑in, yard, quayside, SGR rail and vessel loading operations at Kenya Ports Authority's Empty Containers Terminal — built so a container's status is never a matter of who you called last.</p>
+                <div class="mag-hero-row">
+                    <div class="mag-hero-cta">
+                        <button class="lp-btn-primary" onclick="showAuth('signin')">Access Portal</button>
+                        <a href="system.html" class="lp-btn-ghost">See how it works →</a>
+                    </div>
+                    <div class="mag-stat-row">
+                        <div class="mag-stat"><strong>17</strong><span>Operational modules</span></div>
+                        <div class="mag-stat"><strong>Real‑time</strong><span>Cloud sync</span></div>
+                        <div class="mag-stat"><strong>100%</strong><span>Actions audited</span></div>
+                    </div>
                 </div>
             </div>
         </header>
 
         <!-- OVERVIEW -->
-        <section class="lp-section" id="lp-overview">
-            <div class="lp-section-inner">
-                <div class="lp-eyebrow-sm">System overview</div>
-                <h2 class="lp-h2">A single source of truth for every container movement</h2>
-                <p class="lp-body">Gate clerks, yard controllers, key site operators, SGR rail staff and vessel loading teams have historically worked from separate log books, radios and memory. Terminal TMS gives every role the same live container record — checked once, trusted at every stage downstream.</p>
-                <div class="lp-feature-grid">
-                    <div class="lp-feature"><span class="lp-feature-ic">📋</span><span>Pre‑advice &amp; Gate In</span></div>
-                    <div class="lp-feature"><span class="lp-feature-ic">🏗️</span><span>Yard &amp; Key Site staging</span></div>
-                    <div class="lp-feature"><span class="lp-feature-ic">🚂</span><span>SGR Rail integration</span></div>
-                    <div class="lp-feature"><span class="lp-feature-ic">🛳️</span><span>Vessel Loading &amp; random‑load detection</span></div>
-                    <div class="lp-feature"><span class="lp-feature-ic">↔️</span><span>Shifting &amp; Shutout tracking</span></div>
-                    <div class="lp-feature"><span class="lp-feature-ic">📊</span><span>Reports &amp; compliance exports</span></div>
+        <section class="mag-section">
+            <div class="mag-inner">
+                <div class="mag-split">
+                    <div>
+                        <div class="mag-section-head"><span class="mag-section-num">01</span><h2>A single source of truth</h2></div>
+                        <p class="mag-lede mag-dropcap">Gate clerks, yard controllers, quayside operators, SGR rail staff and vessel loading teams have historically worked from separate log books, radios and memory. Terminal TMS gives every role the same live container record — checked once, trusted at every stage downstream.</p>
+                        <div class="mag-index-grid">
+                            <div class="mag-index-item"><span class="mag-index-ic">📋</span><div><h4>Pre‑advice &amp; Gate In</h4><p>Registered before arrival, captured once at the barrier.</p></div></div>
+                            <div class="mag-index-item"><span class="mag-index-ic">🏗️</span><div><h4>Yard &amp; Quayside staging</h4><p>Location and clerk logged the moment it happens.</p></div></div>
+                            <div class="mag-index-item"><span class="mag-index-ic">🚂</span><div><h4>SGR Rail integration</h4><p>Received off rail into the same live record.</p></div></div>
+                            <div class="mag-index-item"><span class="mag-index-ic">🛳️</span><div><h4>Vessel Loading</h4><p>Random‑load detection built into every load.</p></div></div>
+                            <div class="mag-index-item"><span class="mag-index-ic">↔️</span><div><h4>Shifting &amp; Shutouts</h4><p>Every move and every miss is tracked.</p></div></div>
+                            <div class="mag-index-item"><span class="mag-index-ic">📊</span><div><h4>Reports &amp; exports</h4><p>Compliance reporting is an export, not a reconstruction.</p></div></div>
+                        </div>
+                        <p style="margin-top:2rem"><a href="system.html" class="lp-btn-ghost">Read the full operational flow →</a></p>
+                    </div>
+                    <figure class="mag-figure">
+                        <img src="https://images.unsplash.com/photo-1759216373582-a24c4a65b031?auto=format&amp;fit=crop&amp;w=1200&amp;q=70" alt="Container ship loading with cranes and forklift at port" loading="lazy">
+                        <figcaption class="mag-figure-cap">Quayside loading operations · Mombasa MCT</figcaption>
+                    </figure>
                 </div>
             </div>
         </section>
 
-        <!-- HOW IT WORKS -->
-        <section class="lp-section lp-section-alt" id="lp-flow">
-            <div class="lp-section-inner">
-                <div class="lp-eyebrow-sm">Ship to gate</div>
-                <h2 class="lp-h2">How a container moves through the system</h2>
-                <p class="lp-body">Five stages, one continuous record — nothing is re‑entered or re‑checked between them.</p>
-                <div class="lp-flow-grid">
-                    <div class="lp-flow-step"><div class="lp-flow-num">01</div><h3>Pre‑advice</h3><p>Container is registered before it arrives, so gate clerks aren't creating records from scratch at the barrier.</p></div>
-                    <div class="lp-flow-step"><div class="lp-flow-num">02</div><h3>Gate In</h3><p>Plate, transporter and yard block captured once; a position slip is issued automatically.</p></div>
-                    <div class="lp-flow-step"><div class="lp-flow-num">03</div><h3>Yard / Key Site / SGR</h3><p>Held, staged or received off rail — location and clerk logged the moment it happens.</p></div>
-                    <div class="lp-flow-step"><div class="lp-flow-num">04</div><h3>Vessel Loading</h3><p>Loaded against its designated vessel; if it's actually loaded on a different one, a reason is required before the record closes.</p></div>
-                    <div class="lp-flow-step"><div class="lp-flow-num">05</div><h3>Departed / Reported</h3><p>Every movement is already logged — reporting is an export, not a reconstruction.</p></div>
-                </div>
-            </div>
-        </section>
+        <!-- PHOTO BREAK -->
+        <div class="mag-photo-break" style="background-image:url('https://images.unsplash.com/photo-1634646809203-f3b4adff9127?auto=format&amp;fit=crop&amp;w=2200&amp;q=65')">
+            <div class="mag-photo-break-cap">Empty container stacks · Yard &amp; Quayside staging</div>
+        </div>
 
-        <!-- BENEFITS -->
-        <section class="lp-section" id="lp-benefits">
-            <div class="lp-section-inner">
-                <div class="lp-eyebrow-sm">Why it matters</div>
-                <h2 class="lp-h2">Benefits</h2>
-                <div class="lp-card-grid">
-                    <div class="lp-card"><span class="lp-card-ic">👁️</span><h3>Full visibility</h3><p>Dashboard, dwell‑time and vessel‑loading reports show exactly where every container sits, without radio calls to reconstruct it.</p></div>
-                    <div class="lp-card"><span class="lp-card-ic">🎲</span><h3>Fewer loading errors</h3><p>When a container is loaded onto a vessel other than the one it was pre‑advised for, the system requires a documented reason — nothing slips through silently.</p></div>
-                    <div class="lp-card"><span class="lp-card-ic">⏱️</span><h3>Faster turnaround</h3><p>Gate, yard and vessel loading share one record, so nothing is re‑entered or re‑checked at each stage.</p></div>
-                    <div class="lp-card"><span class="lp-card-ic">🧾</span><h3>Audit‑ready by default</h3><p>Every gate‑in, shift, shutout and load is logged with a timestamp and the clerk who recorded it.</p></div>
-                    <div class="lp-card"><span class="lp-card-ic">🔁</span><h3>Safe for multiple terminals</h3><p>Slip, shift, shutout and random‑load numbers are issued centrally, so two clerks working at once never collide.</p></div>
-                    <div class="lp-card"><span class="lp-card-ic">📡</span><h3>Cloud‑synced, offline‑resilient</h3><p>Actions save instantly to your device and sync to the central system in the background, even on a shaky connection.</p></div>
+        <!-- TRUST TEASER -->
+        <section class="mag-section mag-section-alt">
+            <div class="mag-inner">
+                <div class="mag-split mag-split-reverse">
+                    <figure class="mag-figure">
+                        <img src="https://images.unsplash.com/photo-1759273560543-7f0e66af2a4d?auto=format&amp;fit=crop&amp;w=1200&amp;q=70" alt="Cargo ship docked at a port with large cranes" loading="lazy">
+                        <figcaption class="mag-figure-cap">Vessel berth · Mombasa MCT</figcaption>
+                    </figure>
+                    <div>
+                        <div class="mag-section-head"><span class="mag-section-num">02</span><h2>Built on trust, not trust me</h2></div>
+                        <p class="mag-lede">Access control is enforced by the database, not the interface — with role‑based accounts, an append‑only audit trail and approval‑gated registration for every new user.</p>
+                        <blockquote class="mag-pullquote">"Every action is written to a log, attributed to the account that performed it, and never silently overwritten."<cite>Security model · Terminal TMS</cite></blockquote>
+                        <p><a href="security.html" class="lp-btn-ghost">See security &amp; account types →</a></p>
+                    </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- SECURITY -->
-        <section class="lp-section lp-section-alt" id="lp-security">
-            <div class="lp-section-inner">
-                <div class="lp-eyebrow-sm">Trust</div>
-                <h2 class="lp-h2">Security &amp; safeguards</h2>
-                <p class="lp-body">Access control is enforced by the database, not the interface.</p>
-                <div class="lp-card-grid">
-                    <div class="lp-card"><span class="lp-card-ic">🔐</span><h3>Row‑level security</h3><p>Every table is governed by database‑level policy, not just by what the interface happens to show.</p></div>
-                    <div class="lp-card"><span class="lp-card-ic">✅</span><h3>Approval‑gated accounts</h3><p>Anyone can request an account, but every new registration sits pending until an administrator reviews and approves it.</p></div>
-                    <div class="lp-card"><span class="lp-card-ic">🧭</span><h3>Role‑based access</h3><p>Thirteen distinct account types — from KPA clerks to transporters and clearing agents — so each account reflects who actually holds it.</p></div>
-                    <div class="lp-card"><span class="lp-card-ic">📜</span><h3>Full audit trail</h3><p>Every action is written to an append‑only log, attributed to the account that performed it, and never silently overwritten.</p></div>
-                    <div class="lp-card"><span class="lp-card-ic">🔑</span><h3>Session‑based authentication</h3><p>Sign‑in is backed by real authentication with persisted sessions — no shared logins, no role chosen client‑side and trusted on its own.</p></div>
-                    <div class="lp-card"><span class="lp-card-ic">🧮</span><h3>Atomic record numbering</h3><p>Position slip, shift, shutout and random‑load IDs are generated centrally, so records can never collide or be duplicated.</p></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ROLES -->
-        <section class="lp-section" id="lp-roles">
-            <div class="lp-section-inner">
-                <div class="lp-eyebrow-sm">Built for the terminal</div>
-                <h2 class="lp-h2">Account types</h2>
-                <p class="lp-body">Every account sees the same system, provisioned with a role that reflects who actually holds it. Choose yours when you register.</p>
-                <div class="lp-roles-grid">
-                    <div class="lp-role"><strong>KPA Employee</strong><span>General Kenya Ports Authority staff access.</span></div>
-                    <div class="lp-role"><strong>KPA Clerk</strong><span>Gate, yard and documentation processing.</span></div>
-                    <div class="lp-role"><strong>KPA Dispatcher</strong><span>Coordinates vessel and yard movements.</span></div>
-                    <div class="lp-role"><strong>KPA Machine Operator</strong><span>RTG, crane and yard equipment operations.</span></div>
-                    <div class="lp-role"><strong>KPA Supervisor</strong><span>Oversight across gate, yard and vessel operations.</span></div>
-                    <div class="lp-role"><strong>Terminal Supervisor</strong><span>Full operational oversight of terminal activity.</span></div>
-                    <div class="lp-role"><strong>Yard Manager</strong><span>Yard block allocation and capacity management.</span></div>
-                    <div class="lp-role"><strong>Port User</strong><span>General port stakeholder access.</span></div>
-                    <div class="lp-role"><strong>Transporter</strong><span>Truck and haulage company access for gate movements.</span></div>
-                    <div class="lp-role"><strong>Depot Operator</strong><span>Off‑dock depot and empty container handling.</span></div>
-                    <div class="lp-role"><strong>Agent / Clerk</strong><span>Shipping line or forwarding agency clerk access.</span></div>
-                    <div class="lp-role"><strong>Clearing Agent</strong><span>Customs clearing and forwarding access.</span></div>
-                </div>
-                <p class="lp-roles-note">Administrator accounts are provisioned directly by Kenya Ports Authority IT and are not available through self‑registration.</p>
             </div>
         </section>
 
         <!-- CTA -->
-        <section class="lp-cta">
-            <div class="lp-cta-inner">
-                <h2>Already have an account?</h2>
-                <p>Sign in to access the terminal management portal.</p>
-                <button class="lp-btn-primary" onclick="showAuth('signin')">Access Portal</button>
-            </div>
+        <section class="mag-cta-band">
+            <h2>Already have an account?</h2>
+            <p>Sign in to access the terminal management portal.</p>
+            <button class="lp-btn-primary" onclick="showAuth('signin')">Access Portal</button>
         </section>
 
-        <footer class="lp-footer">
-            <div class="lp-footer-inner">
-                <div class="lp-brand"><span class="lp-brand-emblem">⚓</span> Terminal TMS</div>
-                <div class="lp-footer-text">
+        <footer class="site-footer">
+            <div class="site-footer-inner">
+                <div class="site-footer-top">
+                    <div class="lp-brand"><span class="lp-brand-emblem">⚓</span> Terminal TMS</div>
+                    <div class="site-footer-links">
+                        <a href="index.html">Home</a>
+                        <a href="system.html">System</a>
+                        <a href="security.html">Security</a>
+                        <a href="contact.html">Contact</a>
+                    </div>
+                </div>
+                <div class="site-footer-bottom">
                     <div>Kenya Ports Authority · info@kpa.go.ke · +254 41 222 5143</div>
-                    <div>Authorized personnel and registered corridor partners only. All activity is logged and audited.</div>
-                    <div>v11.0 Production · Mombasa MCT</div>
+                    <div>Authorized personnel and registered corridor partners only. All activity is logged and audited. · v11.0 Production · Mombasa MCT</div>
                 </div>
             </div>
         </footer>
@@ -247,7 +212,7 @@
             <div class="nav-item" data-tab="vessel-to-yard"><span class="ni">🚢</span>Vessel → Yard (Empties)</div>
             <div class="nav-item" data-tab="yard"><span class="ni">📍</span>Yard Operations</div>
             <div class="nav-item" data-tab="shifting"><span class="ni">🔀</span>Shifting <span class="nav-badge" id="nb-shift">0</span></div>
-            <div class="nav-item" data-tab="keysite"><span class="ni">⚓</span>Pre-Stake / Key Site</div>
+            <div class="nav-item" data-tab="quayside"><span class="ni">⚓</span>Pre-Stake / Quayside</div>
             <div class="nav-item" data-tab="vessel"><span class="ni">🛳️</span>Vessel Loading</div>
             <div class="nav-item" data-tab="shutouts"><span class="ni">🚫</span>Shutouts <span class="nav-badge" id="nb-shutout">0</span></div>
             <div class="nav-item" data-tab="random-loading"><span class="ni">🎲</span>Random Loading <span class="nav-badge" id="nb-random">0</span></div>
@@ -325,7 +290,7 @@
                                         <th>Total</th>
                                         <th>Pre-adv</th>
                                         <th>Gated in</th>
-                                        <th>Key site</th>
+                                        <th>Quayside</th>
                                         <th>Loaded</th>
                                         <th>SGR/ICD</th>
                                         <th>Overdue</th>
@@ -378,7 +343,7 @@
                         <div style="flex:1;min-width:200px"><label style="margin-bottom:4px">Search</label><input id="srch" placeholder="🔍 ID / Line / Vessel / Yard..." oninput="renderTable()"></div>
                         <div style="min-width:160px">
                             <label style="margin-bottom:4px">Status</label>
-                            <select id="fStatus" onchange="renderTable()"><option value="">All Status</option><option>PREADVISED</option><option>GATED_IN</option><option>ON_WAGON</option><option>RECEIVED_SGR</option><option>VESSEL_TO_YARD</option><option>KEY_SITE</option><option>LOADED_VESSEL</option><option>SHUTOUT</option><option>OUT_OF_PORT</option></select>
+                            <select id="fStatus" onchange="renderTable()"><option value="">All Status</option><option>PREADVISED</option><option>GATED_IN</option><option>ON_WAGON</option><option>RECEIVED_SGR</option><option>VESSEL_TO_YARD</option><option>QUAYSIDE</option><option>LOADED_VESSEL</option><option>SHUTOUT</option><option>OUT_OF_PORT</option></select>
                         </div>
                         <div style="min-width:140px">
                             <label style="margin-bottom:4px">Entry Point</label>
@@ -566,7 +531,7 @@
 
             <!-- ─── YARD OPS ─── -->
             <div class="tab-pane" id="tab-yard">
-                <div class="page-hdr"><div><h2>Yard Operations</h2><div class="sub">Move containers to key site, vessel, or out of port</div></div></div>
+                <div class="page-hdr"><div><h2>Yard Operations</h2><div class="sub">Move containers to quayside, vessel, or out of port</div></div></div>
                 <div class="grid-2">
                     <div class="card">
                         <div class="card-title">📍 Yard Move / Status Transition</div>
@@ -578,7 +543,7 @@
                         <div class="form-group mb-2">
                             <label>Action</label>
                             <select id="y-action" onchange="toggleYardVesselFields()">
-                                <option value="KEY_SITE">⚓ Move to Key Site (Pre-Stake)</option>
+                                <option value="QUAYSIDE">⚓ Move to Quayside (Pre-Stake)</option>
                                 <option value="LOADED_VESSEL">🚢 Direct to Vessel Load</option>
                                 <option value="OUT_OF_PORT">🚪 Move Out of Port</option>
                             </select>
@@ -647,12 +612,12 @@
                                 <option>G2205</option>
                                 <option>SGR-YARD</option>
                                 <option>HOLDING-AREA</option>
-                                <option>KEY-SITE</option>
+                                <option>QUAYSIDE</option>
                             </select>
                         </div>
                         <div class="form-group mb-2">
                             <label>Reason for Shift *</label>
-                            <select id="sh-reason"><option value="Crane Ops">Crane Operations</option><option value="Vessel Planning">Vessel Planning</option><option value="Yard Optimization">Yard Optimization</option><option value="Key Site Prep">Key Site Preparation</option><option value="Reefer Bay">Reefer Bay Allocation</option><option value="Customer Request">Customer Request</option><option value="Inspection">Customs/Inspection</option><option value="Other">Other</option></select>
+                            <select id="sh-reason"><option value="Crane Ops">Crane Operations</option><option value="Vessel Planning">Vessel Planning</option><option value="Yard Optimization">Yard Optimization</option><option value="Quayside Prep">Quayside Preparation</option><option value="Reefer Bay">Reefer Bay Allocation</option><option value="Customer Request">Customer Request</option><option value="Inspection">Customs/Inspection</option><option value="Other">Other</option></select>
                         </div>
                         <div class="form-group mb-2"><label>Equipment Used</label><input id="sh-equip" placeholder="e.g. RTG-02, Forklift-01"></div>
                         <div class="form-group mb-2"><label>Shift Clerk</label><input id="sh-clerk" placeholder="Clerk / operator name"></div>
@@ -675,13 +640,13 @@
                 </div>
             </div>
 
-            <!-- ─── KEY SITE / PRE-STAKE ─── -->
-            <div class="tab-pane" id="tab-keysite">
+            <!-- ─── QUAYSIDE / PRE-STAKE ─── -->
+            <div class="tab-pane" id="tab-quayside">
                 <div class="page-hdr">
-                    <div><h2>Pre-Stake / Key Site</h2><div class="sub">Containers staged at key site ready for vessel loading or direct-to-vessel movement</div></div>
+                    <div><h2>Pre-Stake / Quayside</h2><div class="sub">Containers staged at quayside ready for vessel loading or direct-to-vessel movement</div></div>
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-secondary" onclick="exportKeysiteCSV()">📥 Export CSV</button>
-                        <button class="btn btn-sm btn-secondary" onclick="exportKeysitePDF()">📄 PDF Report</button>
+                        <button class="btn btn-sm btn-secondary" onclick="exportQuaysideCSV()">📥 Export CSV</button>
+                        <button class="btn btn-sm btn-secondary" onclick="exportQuaysidePDF()">📄 PDF Report</button>
                     </div>
                 </div>
                 <div class="card mb-3">
@@ -690,42 +655,42 @@
                         <div class="wf-step wf-done">📋 Pre-Advised</div><span class="wf-arrow">→</span>
                         <div class="wf-step wf-done">✅ Gated In / Discharged</div><span class="wf-arrow">→</span>
                         <div class="wf-step wf-done">📍 Yard Block</div><span class="wf-arrow">→</span>
-                        <div class="wf-step wf-active">⚓ KEY SITE (Pre-Stake)</div><span class="wf-arrow">→</span>
+                        <div class="wf-step wf-active">⚓ QUAYSIDE (Pre-Stake)</div><span class="wf-arrow">→</span>
                         <div class="wf-step wf-pending">🛳️ Vessel Load / Direct</div>
                     </div>
                 </div>
                 <div class="grid-2 mb-3">
                     <div class="card">
-                        <div class="card-title">⚓ Move to Key Site (Pre-Stake)</div>
-                        <div class="section-tag">Move a gated-in or yard-received container to the Key Site staging area for vessel loading.</div>
+                        <div class="card-title">⚓ Move to Quayside (Pre-Stake)</div>
+                        <div class="section-tag">Move a gated-in or yard-received container to the Quayside staging area for vessel loading.</div>
                         <div class="form-group mb-2">
                             <label>Container ID *</label>
-                            <select id="ks-move-id" onchange="keysiteMoveAutofill()"><option value="">— Select Eligible Container —</option></select>
+                            <select id="qs-move-id" onchange="quaysideMoveAutofill()"><option value="">— Select Eligible Container —</option></select>
                         </div>
-                        <div id="ks-move-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
-                        <div class="form-group mb-2"><label>Key Site Bay / Slot</label><input id="ks-bay" placeholder="e.g. KS-A01, BERTH-2-SLOT-04"></div>
-                        <div class="form-group mb-2"><label>Vessel (confirm) *</label><input id="ks-vessel" placeholder="Target vessel name" oninput="this.value=this.value.toUpperCase()"></div>
-                        <div class="form-group mb-2"><label>Voyage</label><input id="ks-voyage" placeholder="Voyage number"></div>
-                        <div class="form-group mb-2"><label>Equipment Used</label><input id="ks-equip" placeholder="e.g. RTG-04, Forklift-02"></div>
-                        <div class="form-group mb-2"><label>Pre-Stake Clerk *</label><input id="ks-clerk" placeholder="Clerk / TT Operator"></div>
-                        <div class="form-group mb-2"><label>Remarks</label><input id="ks-remark" placeholder="Additional notes"></div>
-                        <button class="btn btn-primary" onclick="moveToKeysite()" style="width:100%;margin-top:0.5rem">⚓ Execute Pre-Stake to Key Site</button>
+                        <div id="qs-move-autofill" class="hidden mb-2 text-sm" style="background:rgba(56,189,248,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(56,189,248,0.16)"></div>
+                        <div class="form-group mb-2"><label>Quayside Bay / Slot</label><input id="qs-bay" placeholder="e.g. QS-A01, BERTH-2-SLOT-04"></div>
+                        <div class="form-group mb-2"><label>Vessel (confirm) *</label><input id="qs-vessel" placeholder="Target vessel name" oninput="this.value=this.value.toUpperCase()"></div>
+                        <div class="form-group mb-2"><label>Voyage</label><input id="qs-voyage" placeholder="Voyage number"></div>
+                        <div class="form-group mb-2"><label>Equipment Used</label><input id="qs-equip" placeholder="e.g. RTG-04, Forklift-02"></div>
+                        <div class="form-group mb-2"><label>Pre-Stake Clerk *</label><input id="qs-clerk" placeholder="Clerk / TT Operator"></div>
+                        <div class="form-group mb-2"><label>Remarks</label><input id="qs-remark" placeholder="Additional notes"></div>
+                        <button class="btn btn-primary" onclick="moveToQuayside()" style="width:100%;margin-top:0.5rem">⚓ Execute Pre-Stake to Quayside</button>
                     </div>
                     <div class="card">
-                        <div class="card-title">🛳️ Direct to Vessel from Key Site</div>
-                        <div class="section-tag">Load a container from Key Site directly onto the vessel — final step of the pre-stake process.</div>
+                        <div class="card-title">🛳️ Direct to Vessel from Quayside</div>
+                        <div class="section-tag">Load a container from Quayside directly onto the vessel — final step of the pre-stake process.</div>
                         <div class="form-group mb-2">
-                            <label>Container ID (at Key Site) *</label>
-                            <select id="ks-load-id" onchange="keysiteLoadAutofill()"><option value="">— Select Key Site Container —</option></select>
+                            <label>Container ID (at Quayside) *</label>
+                            <select id="qs-load-id" onchange="quaysideLoadAutofill()"><option value="">— Select Quayside Container —</option></select>
                         </div>
-                        <div id="ks-load-autofill" class="hidden mb-2 text-sm" style="background:rgba(52,211,153,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(52,211,153,0.16)"></div>
-                        <div class="form-group mb-2"><label>Actual Vessel Loaded (leave blank if same as designated)</label><input id="ks-load-actual-vessel" placeholder="Designated vessel auto-used if blank" oninput="checkRandomLoadUI('ks-load')"></div>
-                        <div class="form-group mb-2"><label>Actual Voyage</label><input id="ks-load-actual-voyage" placeholder="Voyage (if different)"></div>
-                        <div id="ks-load-random-block" class="hidden mb-2" style="background:rgba(251,146,60,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(251,146,60,0.2)">
+                        <div id="qs-load-autofill" class="hidden mb-2 text-sm" style="background:rgba(52,211,153,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(52,211,153,0.16)"></div>
+                        <div class="form-group mb-2"><label>Actual Vessel Loaded (leave blank if same as designated)</label><input id="qs-load-actual-vessel" placeholder="Designated vessel auto-used if blank" oninput="checkRandomLoadUI('qs-load')"></div>
+                        <div class="form-group mb-2"><label>Actual Voyage</label><input id="qs-load-actual-voyage" placeholder="Voyage (if different)"></div>
+                        <div id="qs-load-random-block" class="hidden mb-2" style="background:rgba(251,146,60,0.06);padding:0.75rem;border-radius:9px;border:1px solid rgba(251,146,60,0.2)">
                             <div class="text-xs" style="color:var(--orange);font-weight:700;margin-bottom:0.5rem">🎲 RANDOM LOADING DETECTED — actual vessel differs from designated. A reason is required.</div>
                             <div class="form-group">
                                 <label>Random Loading Reason *</label>
-                                <select id="ks-load-random-reason">
+                                <select id="qs-load-random-reason">
                                     <option value="">— Select Reason —</option>
                                     <option value="Vessel Planning">Vessel Planning</option>
                                     <option value="Yard Management">Yard Management</option>
@@ -737,21 +702,21 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group mb-2"><label>Loading Clerk *</label><input id="ks-load-clerk" placeholder="Loading clerk full name"></div>
-                        <div class="form-group mb-2"><label>Bay / Position</label><input id="ks-load-bay" placeholder="e.g. BAY-04-T02"></div>
-                        <div class="form-group mb-2"><label>Crane / Equipment</label><input id="ks-load-crane" placeholder="e.g. QC-03, Quay Crane 3"></div>
-                        <div class="form-group mb-2"><label>Remarks</label><input id="ks-load-remark" placeholder="Optional remarks"></div>
-                        <button class="btn btn-success" onclick="loadFromKeysite2()" style="width:100%;margin-top:0.5rem">🛳️ Confirm Load to Vessel</button>
+                        <div class="form-group mb-2"><label>Loading Clerk *</label><input id="qs-load-clerk" placeholder="Loading clerk full name"></div>
+                        <div class="form-group mb-2"><label>Bay / Position</label><input id="qs-load-bay" placeholder="e.g. BAY-04-T02"></div>
+                        <div class="form-group mb-2"><label>Crane / Equipment</label><input id="qs-load-crane" placeholder="e.g. QC-03, Quay Crane 3"></div>
+                        <div class="form-group mb-2"><label>Remarks</label><input id="qs-load-remark" placeholder="Optional remarks"></div>
+                        <button class="btn btn-success" onclick="loadFromQuayside2()" style="width:100%;margin-top:0.5rem">🛳️ Confirm Load to Vessel</button>
                     </div>
                 </div>
                 <div class="card">
                     <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
-                        <div class="card-title" style="margin:0">⚓ Key Site Population — <span id="keysiteCount" style="color:var(--accent)">0 containers</span></div>
+                        <div class="card-title" style="margin:0">⚓ Quayside Population — <span id="quaysideCount" style="color:var(--accent)">0 containers</span></div>
                         <div class="flex gap-2">
-                            <input id="ksSearch" placeholder="🔍 Search..." style="max-width:200px;height:32px;font-size:0.78rem" oninput="renderKeysite()">
+                            <input id="qsSearch" placeholder="🔍 Search..." style="max-width:200px;height:32px;font-size:0.78rem" oninput="renderQuayside()">
                         </div>
                     </div>
-                    <div class="table-wrap"><table><thead><tr><th>Container ID</th><th>Line</th><th>Type</th><th>Vessel</th><th>Voyage</th><th>KS Bay</th><th>Source</th><th>Entry</th><th>Dwell</th><th>Shifts</th><th>Pre-Stake Clerk</th><th>Action</th></tr></thead><tbody id="keysiteBody"></tbody></table></div>
+                    <div class="table-wrap"><table><thead><tr><th>Container ID</th><th>Line</th><th>Type</th><th>Vessel</th><th>Voyage</th><th>QS Bay</th><th>Source</th><th>Entry</th><th>Dwell</th><th>Shifts</th><th>Pre-Stake Clerk</th><th>Action</th></tr></thead><tbody id="quaysideBody"></tbody></table></div>
                 </div>
             </div>
 
@@ -806,10 +771,10 @@
                 <div class="grid-2">
                     <div class="card">
                         <div class="card-title">🚫 Record Shutout</div>
-                        <div class="section-tag">Container was at Key Site / ready for load but was NOT loaded onto the vessel.</div>
+                        <div class="section-tag">Container was at Quayside / ready for load but was NOT loaded onto the vessel.</div>
                         <div class="form-group mb-2">
                             <label>Container ID *</label>
-                            <select id="so-id" onchange="shutoutAutofill()"><option value="">— Select Container (Key Site / Gated In) —</option></select>
+                            <select id="so-id" onchange="shutoutAutofill()"><option value="">— Select Container (Quayside / Gated In) —</option></select>
                         </div>
                         <div id="so-autofill" class="hidden mb-2 text-sm" style="background:rgba(251,113,133,0.05);padding:0.75rem;border-radius:9px;border:1px solid rgba(251,113,133,0.18)"></div>
                         <div class="form-group mb-2"><label>Vessel (Missed)</label><input id="so-vessel" readonly style="background:rgba(10,18,35,0.4)"></div>
@@ -834,7 +799,7 @@
                         <div class="form-group mb-2"><label>Responsible Clerk</label><input id="so-clerk" placeholder="Clerk / officer name"></div>
                         <div class="form-group mb-2">
                             <label>Next Action</label>
-                            <select id="so-action"><option value="Return to Yard">Return to Yard</option><option value="Key Site Hold">Hold at Key Site</option><option value="Next Vessel">Book on Next Vessel</option><option value="Return to Depot">Return to Depot</option></select>
+                            <select id="so-action"><option value="Return to Yard">Return to Yard</option><option value="Quayside Hold">Hold at Quayside</option><option value="Next Vessel">Book on Next Vessel</option><option value="Return to Depot">Return to Depot</option></select>
                         </div>
                         <div class="form-group mb-2"><label>Remarks</label><input id="so-remark" placeholder="Additional details"></div>
                         <button class="btn btn-danger" onclick="recordShutout()" style="width:100%">🚫 Record Shutout</button>
@@ -861,7 +826,7 @@
                     <button class="btn btn-sm btn-secondary" onclick="exportRandomLoadingCSV()">📥 Export CSV</button>
                 </div>
                 <div class="card mb-3">
-                    <div class="section-tag">🎲 Random loading happens when a container is loaded onto a vessel/voyage different from what it was designated for — due to vessel planning, yard management, shutout replacement, or other operational reasons. These are captured automatically wherever containers are loaded (Vessel Loading, Key Site direct load, Yard direct-to-vessel), and are fully searchable and reportable here.</div>
+                    <div class="section-tag">🎲 Random loading happens when a container is loaded onto a vessel/voyage different from what it was designated for — due to vessel planning, yard management, shutout replacement, or other operational reasons. These are captured automatically wherever containers are loaded (Vessel Loading, Quayside direct load, Yard direct-to-vessel), and are fully searchable and reportable here.</div>
                 </div>
                 <div class="grid-2 mb-3">
                     <div class="card">
@@ -1055,7 +1020,7 @@
                     <select id="rpt-vessel" onchange="applyReportFilters()" style="max-width:180px"><option value="">All Vessels</option></select>
                     <select id="rpt-line" onchange="applyReportFilters()" style="max-width:150px"><option value="">All Lines</option></select>
                     <select id="rpt-source" onchange="applyReportFilters()" style="max-width:140px"><option value="">All Sources</option><option>Gate18</option><option>Gate24</option><option>ICD</option><option>Vessel</option></select>
-                    <select id="rpt-status" onchange="applyReportFilters()" style="max-width:160px"><option value="">All Statuses</option><option>PREADVISED</option><option>GATED_IN</option><option>KEY_SITE</option><option>LOADED_VESSEL</option><option>SHUTOUT</option></select>
+                    <select id="rpt-status" onchange="applyReportFilters()" style="max-width:160px"><option value="">All Statuses</option><option>PREADVISED</option><option>GATED_IN</option><option>QUAYSIDE</option><option>LOADED_VESSEL</option><option>SHUTOUT</option></select>
                     <button class="btn btn-sm btn-secondary" onclick="clearReportFilters()">✕ Clear Filters</button>
                 </div>
                 <div class="report-tabs">
@@ -1090,7 +1055,7 @@
                     </div>
                     <div class="card mt-3">
                         <div class="card-title">🛳️ Vessel Performance Table</div>
-                        <div class="report-table-wrap"><table class="report-table"><thead><tr><th>Vessel</th><th>Gated In</th><th>Key Site</th><th>Loaded</th><th>Shutouts</th><th>Load Rate</th></tr></thead><tbody id="rpt-vessel-tbody"></tbody></table></div>
+                        <div class="report-table-wrap"><table class="report-table"><thead><tr><th>Vessel</th><th>Gated In</th><th>Quayside</th><th>Loaded</th><th>Shutouts</th><th>Load Rate</th></tr></thead><tbody id="rpt-vessel-tbody"></tbody></table></div>
                     </div>
                 </div>
                 <div class="report-section" id="rsec-performance">
@@ -1200,7 +1165,7 @@
         <div class="mob-item active" data-tab="dashboard"><span class="mi">📊</span>Dashboard</div>
         <div class="mob-item" data-tab="containers"><span class="mi">📦</span>Empties</div>
         <div class="mob-item" data-tab="gate"><span class="mi">🚛</span>Gate</div>
-        <div class="mob-item" data-tab="keysite"><span class="mi">⚓</span>PreStake</div>
+        <div class="mob-item" data-tab="quayside"><span class="mi">⚓</span>PreStake</div>
         <div class="mob-item" data-tab="reports"><span class="mi">📈</span>Reports</div>
     </nav>
 

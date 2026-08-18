@@ -198,7 +198,7 @@ const IMP_STORAGE = 'KPA_TMS_IMP_V10';
 
 // Explicit column maps for containers/import_containers — any object field not listed here is
 // preserved losslessly in the `extra` jsonb column, so the client model can evolve freely.
-const CONTAINER_COL_MAP = { id: 'id', line: 'line', vessel: 'vessel', voyage: 'voyage', pod: 'pod', type: 'type', source: 'source', status: 'status', yard: 'yard', positionSlip: 'position_slip', wagon: 'wagon', bay: 'bay', ksBay: 'ks_bay', ksClerk: 'ks_clerk', loadedBy: 'loaded_by', weight: 'weight', height: 'height', shiftCount: 'shift_count', shutout: 'shutout', created: 'created_at', gatedAt: 'gated_at', loaded: 'loaded_at', movements: 'movements' };
+const CONTAINER_COL_MAP = { id: 'id', line: 'line', vessel: 'vessel', voyage: 'voyage', pod: 'pod', type: 'type', source: 'source', status: 'status', yard: 'yard', positionSlip: 'position_slip', wagon: 'wagon', bay: 'bay', qsBay: 'qs_bay', qsClerk: 'qs_clerk', loadedBy: 'loaded_by', weight: 'weight', height: 'height', shiftCount: 'shift_count', shutout: 'shutout', created: 'created_at', gatedAt: 'gated_at', loaded: 'loaded_at', movements: 'movements' };
 const IMPORT_COL_MAP = { id: 'id', line: 'line', vessel: 'vessel', type: 'type', status: 'status', ttTag: 'tt_tag', yardBlock: 'yard_block', receivingClerk: 'receiving_clerk', rtgOperator: 'rtg_operator', releaseClerk: 'release_clerk', truckPlate: 'truck_plate', destination: 'destination', dischargedAt: 'discharged_at', releasedAt: 'released_at', movements: 'movements' };
 
 function objToRow(obj, colMap) {
@@ -345,7 +345,7 @@ const STATUS_META = {
     ON_WAGON: { label: 'On Wagon', badge: 'b-wagon', icon: '🚋' },
     RECEIVED_SGR: { label: 'Received SGR', badge: 'b-sgr', icon: '🏁' },
     VESSEL_TO_YARD: { label: 'Vessel→Yard', badge: 'b-vessel-yard', icon: '🚢' },
-    KEY_SITE: { label: 'Key Site', badge: 'b-keysite', icon: '⚓' },
+    QUAYSIDE: { label: 'Quayside', badge: 'b-quayside', icon: '⚓' },
     LOADED_VESSEL: { label: 'Loaded Vessel', badge: 'b-loaded', icon: '🛳️' },
     SHUTOUT: { label: 'Shut Out', badge: 'b-shutout', icon: '🚫' },
     OUT_OF_PORT: { label: 'Out of Port', badge: 'b-out', icon: '🚪' },
@@ -427,7 +427,7 @@ function seedDemo() {
         id, line, vessel, voyage, pod: pod || 'CNNSA', type: type || '20G0', source, status, yard: yard || '', positionSlip: slip || '',
         created, loaded: status === 'LOADED_VESSEL' ? created + h * 2 : null, loadedBy: loadedBy || '', wagon: wagon || '', bay: bay || '',
         weight: wt || '4444.0', height: ht || "8'", movements: [], iso: type || '20G0', transco: '', plate: '', transtype: 'TRUCK',
-        clerk: '', shiftCount: 0, shutout: false, preadviceTime: created, ksBay: '', ksClerk: ''
+        clerk: '', shiftCount: 0, shutout: false, preadviceTime: created, qsBay: '', qsClerk: ''
     });
     DB.containers = [
         mk('MSCU9000001', 'MSC', 'MSC FLORIANA VI', 'V.2412', 'CNSHA', '20G0', 'Gate18', 'PREADVISED', '', '', now - 3 * h),
@@ -436,12 +436,12 @@ function seedDemo() {
         mk('TXGU7745354', 'EVG', 'X-PRESS ANTARES', '26016W/26016E', 'CNNSA', '40G0', 'Gate18', 'GATED_IN', 'G2203', 'PS260477513/MCT', now - 30 * h, '', '', '', '4444.0', "8'"),
         mk('MSCU9000004', 'MSC', 'MSC FLORIANA VI', 'V.2412', 'CNSHA', '20G0', 'ICD', 'ON_WAGON', '', '', now - 22 * h, '', 'WGN-2045'),
         mk('MAEU8000005', 'MAERSK', 'MAERSK OHIO', 'V.503', 'CNYTN', '20G0', 'ICD', 'RECEIVED_SGR', 'SGR-YARD', '', now - 36 * h),
-        mk('CMAU7000006', 'CMA CGM', 'CMA TITAN', 'V.112', 'CNNBO', '40HC', 'Gate24', 'KEY_SITE', 'BLOCK-A-02', 'PS260002/MCT', now - 50 * h),
+        mk('CMAU7000006', 'CMA CGM', 'CMA TITAN', 'V.112', 'CNNBO', '40HC', 'Gate24', 'QUAYSIDE', 'BLOCK-A-02', 'PS260002/MCT', now - 50 * h),
         mk('EVGU1234567', 'EVG', 'X-PRESS ANTARES', '26016W/26016E', 'CNNSA', '20G0', 'Gate18', 'LOADED_VESSEL', 'BLOCK-C-01', 'PS260003/MCT', now - 72 * h, 'John Mwangi', '', 'BAY-04-T02'),
         mk('FCIU3311686', 'MSC', 'MSC FLORIANA VI', 'V.2412', 'CNSHA', '20G0', 'ICD', 'PREADVISED', '', '', now - 5 * h),
         mk('CAAU2126050', 'MSC', 'MSC FLORIANA VI', 'V.2412', 'CNSHA', '20G0', 'ICD', 'PREADVISED', '', '', now - 5 * h),
         mk('HLCU1188774', 'HAPAG-LLOYD', 'BELLAVIA', 'V.09', 'SGSIN', '40HC', 'Gate18', 'GATED_IN', 'BLOCK-D-01', 'PS260004/MCT', now - 45 * h),
-        mk('OOLU2255663', 'OOCL', 'OOCL HONG KONG', 'V.44N', 'HKHKG', '20G0', 'Gate24', 'KEY_SITE', 'BLOCK-A-01', 'PS260005/MCT', now - 60 * h),
+        mk('OOLU2255663', 'OOCL', 'OOCL HONG KONG', 'V.44N', 'HKHKG', '20G0', 'Gate24', 'QUAYSIDE', 'BLOCK-A-01', 'PS260005/MCT', now - 60 * h),
         mk('YMLU3344551', 'ONE', 'ONE HARMONY', 'V.021W', 'JPYOK', '40G0', 'Vessel', 'VESSEL_TO_YARD', 'BLOCK-C-02', '', now - 15 * h),
         mk('COSU9988776', 'COSCO', 'COSCO SHIPPING STAR', 'V.036E', 'CNSHA', '20G0', 'Gate18', 'SHUTOUT', 'BLOCK-B-01', 'PS260006/MCT', now - 80 * h),
         mk('PILU5566443', 'PIL', 'KOTA LEGENDA', 'V.S05', 'PKKAR', '20G0', 'Gate24', 'LOADED_VESSEL', 'G2205', 'PS260007/MCT', now - 90 * h, 'Mary Wambui', '', 'BAY-02-T01'),
@@ -455,7 +455,7 @@ function seedDemo() {
 // ═══ INIT SEARCHABLE DROPDOWNS ═══
 function initAllSearchableDropdowns() {
     const searchableIds = ['g-id', 'vy-id', 'y-id', 'sh-id', 'v-id', 'so-id', 'sgr-load', 'sgr-recv', 'sgr-out',
-        'ks-move-id', 'ks-load-id', 'rl-id', 'imp-tag-id', 'imp-yard-id', 'imp-offload-id', 'imp-release-id',
+        'qs-move-id', 'qs-load-id', 'rl-id', 'imp-tag-id', 'imp-yard-id', 'imp-offload-id', 'imp-release-id',
         'g-yard', 'sh-to', 'fStatus', 'fSource', 'fLine', 'fVessel',
         'rpt-vessel', 'rpt-line', 'rpt-source', 'rpt-status', 'impStatusFilter', 'impLineFilter'];
     searchableIds.forEach(id => {
@@ -472,8 +472,8 @@ function populateAllDropdowns() {
     const preVessel = DB.containers.filter(c => c.status === 'PREADVISED' && c.source === 'Vessel').map(c => ({ value: c.id, text: `${c.id} · ${c.line} · ${c.vessel}` }));
     const inYard = DB.containers.filter(c => ['GATED_IN', 'RECEIVED_SGR', 'VESSEL_TO_YARD'].includes(c.status)).map(c => ({ value: c.id, text: `${c.id} · ${c.line} · ${c.yard || 'No yard'}` }));
     const anyActive = DB.containers.filter(c => !['LOADED_VESSEL', 'OUT_OF_PORT'].includes(c.status)).map(c => ({ value: c.id, text: `${c.id} · ${c.line} · ${badge_text(c.status)}` }));
-    const keysite = DB.containers.filter(c => c.status === 'KEY_SITE').map(c => ({ value: c.id, text: `${c.id} · ${c.line} · ${c.vessel}` }));
-    const keysiteOrGated = DB.containers.filter(c => ['KEY_SITE', 'GATED_IN'].includes(c.status)).map(c => ({ value: c.id, text: `${c.id} · ${c.line} · ${badge_text(c.status)}` }));
+    const quayside = DB.containers.filter(c => c.status === 'QUAYSIDE').map(c => ({ value: c.id, text: `${c.id} · ${c.line} · ${c.vessel}` }));
+    const quaysideOrGated = DB.containers.filter(c => ['QUAYSIDE', 'GATED_IN'].includes(c.status)).map(c => ({ value: c.id, text: `${c.id} · ${c.line} · ${badge_text(c.status)}` }));
     const eligibleKS = DB.containers.filter(c => ['GATED_IN', 'RECEIVED_SGR', 'VESSEL_TO_YARD'].includes(c.status)).map(c => ({ value: c.id, text: `${c.id} · ${c.line} · ${c.yard || '—'}` }));
     const icdPA = DB.containers.filter(c => c.source === 'ICD' && c.status === 'PREADVISED').map(c => ({ value: c.id, text: `${c.id} · ${c.line} · ${c.vessel}` }));
     const onWagon = DB.containers.filter(c => c.status === 'ON_WAGON').map(c => ({ value: c.id, text: `${c.id} · ${c.line} · Wagon:${c.wagon || '?'}` }));
@@ -483,10 +483,10 @@ function populateAllDropdowns() {
     tsAddOptions('vy-id', preVessel);
     tsAddOptions('y-id', inYard);
     tsAddOptions('sh-id', anyActive);
-    tsAddOptions('v-id', keysiteOrGated);
-    tsAddOptions('so-id', keysiteOrGated);
-    tsAddOptions('ks-move-id', eligibleKS);
-    tsAddOptions('ks-load-id', keysite);
+    tsAddOptions('v-id', quaysideOrGated);
+    tsAddOptions('so-id', quaysideOrGated);
+    tsAddOptions('qs-move-id', eligibleKS);
+    tsAddOptions('qs-load-id', quayside);
     tsAddOptions('sgr-load', icdPA);
     tsAddOptions('sgr-recv', onWagon);
     tsAddOptions('sgr-out', sgrArr);
@@ -532,8 +532,8 @@ window.yardAutofill = () => { const id = tsGetValue('y-id'); const c = findC(id)
 window.shiftAutofill = () => { const id = tsGetValue('sh-id'); const c = findC(id); const el = document.getElementById('sh-autofill'); if (c) { el.innerHTML = makeAutofill(c); el.classList.remove('hidden'); document.getElementById('sh-from').value = c.yard || 'Unknown'; } else { el.classList.add('hidden'); document.getElementById('sh-from').value = ''; } };
 window.vesselAutofill = () => { const id = tsGetValue('v-id'); const c = findC(id); const el = document.getElementById('v-autofill'); if (c) { el.innerHTML = makeAutofill(c); el.classList.remove('hidden'); } else el.classList.add('hidden'); };
 window.shutoutAutofill = () => { const id = tsGetValue('so-id'); const c = findC(id); const el = document.getElementById('so-autofill'); if (c) { el.innerHTML = makeAutofill(c); el.classList.remove('hidden'); document.getElementById('so-vessel').value = c.vessel || ''; document.getElementById('so-voyage').value = c.voyage || ''; } else el.classList.add('hidden'); };
-window.keysiteMoveAutofill = () => { const id = tsGetValue('ks-move-id'); const c = findC(id); const el = document.getElementById('ks-move-autofill'); if (c) { el.innerHTML = makeAutofill(c); el.classList.remove('hidden'); document.getElementById('ks-vessel').value = c.vessel || ''; document.getElementById('ks-voyage').value = c.voyage || ''; } else el.classList.add('hidden'); };
-window.keysiteLoadAutofill = () => { const id = tsGetValue('ks-load-id'); const c = findC(id); const el = document.getElementById('ks-load-autofill'); if (c) { el.innerHTML = makeAutofill(c); el.classList.remove('hidden'); } else el.classList.add('hidden'); };
+window.quaysideMoveAutofill = () => { const id = tsGetValue('qs-move-id'); const c = findC(id); const el = document.getElementById('qs-move-autofill'); if (c) { el.innerHTML = makeAutofill(c); el.classList.remove('hidden'); document.getElementById('qs-vessel').value = c.vessel || ''; document.getElementById('qs-voyage').value = c.voyage || ''; } else el.classList.add('hidden'); };
+window.quaysideLoadAutofill = () => { const id = tsGetValue('qs-load-id'); const c = findC(id); const el = document.getElementById('qs-load-autofill'); if (c) { el.innerHTML = makeAutofill(c); el.classList.remove('hidden'); } else el.classList.add('hidden'); };
 
 // ═══ VALIDATION HELPER ═══
 window.validateContainerId = (inp) => { const v = inp.value; const ok = /^[A-Z]{4}[0-9]{7}$/.test(v); document.getElementById('pa-validation').textContent = v.length > 0 && !ok ? '⚠️ Container IDs must be 4 letters + 7 digits (e.g. MSCU1234567)' : ''; }
@@ -557,7 +557,7 @@ window.createContainer = () => {
     if (!/^[A-Z]{4}[0-9]{7}$/.test(id)) return toast('❌ Container ID must be 4 letters + 7 digits (e.g. MSCU1234567)', 'error');
     if (weight && isNaN(parseFloat(weight))) return toast('❌ Weight must be a valid number', 'error');
     const now = Date.now();
-    const c = { id, line, vessel, voyage, pod, type, source, status: 'PREADVISED', yard: '', positionSlip: '', created: now, preadviceTime: now, loaded: null, loadedBy: '', wagon: '', bay: '', movements: [], iso: type, weight: weight || '4444.0', height: height || "8'", transco: '', plate: '', transtype: 'TRUCK', clerk: '', shiftCount: 0, shutout: false, ksBay: '', ksClerk: '' };
+    const c = { id, line, vessel, voyage, pod, type, source, status: 'PREADVISED', yard: '', positionSlip: '', created: now, preadviceTime: now, loaded: null, loadedBy: '', wagon: '', bay: '', movements: [], iso: type, weight: weight || '4444.0', height: height || "8'", transco: '', plate: '', transtype: 'TRUCK', clerk: '', shiftCount: 0, shutout: false, qsBay: '', qsClerk: '' };
     addMov(c, 'PREADVISED', `Pre-advised — Entry: ${source} | Line: ${line} | Vessel: ${vessel}`);
     DB.containers.push(c);
     log(id, 'PREADVISED', `Line:${line} Vessel:${vessel} Source:${source} User:${currentUser}`);
@@ -578,7 +578,7 @@ function parseBulkCSV(text) {
     renderBulkPreview(); document.getElementById('bErrors').innerHTML = errors.length ? `<strong>${errors.length} errors:</strong><br>` + errors.join('<br>') : ''; toast(`Parsed ${bulkData.length} containers — ${bulkData.filter(d => d.valid).length} valid`, 'info');
 }
 function renderBulkPreview() { document.getElementById('bulkPreview').classList.remove('hidden'); document.getElementById('bCount').textContent = bulkData.length; document.getElementById('bBody').innerHTML = bulkData.map(d => `<tr style="${d.valid ? '' : 'opacity:0.5;background:rgba(251,113,133,0.03)'}"><td>${d.row}</td><td class="tbl-id">${d.id || '—'}</td><td>${d.line || '—'}</td><td>${d.vessel || '—'}</td><td>${d.voyage || '—'}</td><td>${d.type || '—'}</td><td>${d.source}</td><td>${d.valid ? '<span class="text-success">✅ Valid</span>' : '<span class="text-danger">❌ ' + (d.dup ? 'Duplicate' : 'Missing') + '</span>'}</td></tr>`).join(''); }
-window.commitBulk = () => { const valid = bulkData.filter(d => d.valid); if (!valid.length) return toast('No valid containers to commit', 'error'); let added = 0; const now = Date.now(); valid.forEach(d => { if (findIdx(d.id) !== -1) return; const c = { id: d.id, line: d.line, vessel: d.vessel, voyage: d.voyage, pod: d.pod, type: d.type, source: d.source, status: 'PREADVISED', yard: '', positionSlip: '', created: now, preadviceTime: now, loaded: null, loadedBy: '', wagon: '', bay: '', movements: [], iso: d.type, weight: '4444.0', height: "8'", transco: '', plate: '', transtype: 'TRUCK', clerk: '', shiftCount: 0, shutout: false, ksBay: '', ksClerk: '' }; addMov(c, 'PREADVISED', `Bulk pre-advised — ${d.source}`); DB.containers.push(c); log(d.id, 'PREADVISED_BULK', `Line:${d.line} Source:${d.source}`); added++; }); save(); renderAll(); updateNavBadges(); clearBulk(); toast(`✅ ${added} containers pre-advised via bulk upload`, 'success'); };
+window.commitBulk = () => { const valid = bulkData.filter(d => d.valid); if (!valid.length) return toast('No valid containers to commit', 'error'); let added = 0; const now = Date.now(); valid.forEach(d => { if (findIdx(d.id) !== -1) return; const c = { id: d.id, line: d.line, vessel: d.vessel, voyage: d.voyage, pod: d.pod, type: d.type, source: d.source, status: 'PREADVISED', yard: '', positionSlip: '', created: now, preadviceTime: now, loaded: null, loadedBy: '', wagon: '', bay: '', movements: [], iso: d.type, weight: '4444.0', height: "8'", transco: '', plate: '', transtype: 'TRUCK', clerk: '', shiftCount: 0, shutout: false, qsBay: '', qsClerk: '' }; addMov(c, 'PREADVISED', `Bulk pre-advised — ${d.source}`); DB.containers.push(c); log(d.id, 'PREADVISED_BULK', `Line:${d.line} Source:${d.source}`); added++; }); save(); renderAll(); updateNavBadges(); clearBulk(); toast(`✅ ${added} containers pre-advised via bulk upload`, 'success'); };
 window.clearBulk = () => { bulkData = []; document.getElementById('bulkPreview').classList.add('hidden'); document.getElementById('bulkFile').value = ''; document.getElementById('bErrors').innerHTML = ''; };
 
 // ═══ GATE IN ═══
@@ -589,7 +589,7 @@ window.gateIn = async () => {
     if (!yard) return toast('❌ Yard / Block selection is required for position slip', 'error');
     const idx = findIdx(id); if (idx === -1) return toast('❌ Container not found — pre-advise first', 'error');
     const c = DB.containers[idx];
-    if (['GATED_IN', 'KEY_SITE', 'LOADED_VESSEL', 'VESSEL_TO_YARD'].includes(c.status)) return toast(`❌ Container already ${badge_text(c.status)} — cannot gate in again`, 'error');
+    if (['GATED_IN', 'QUAYSIDE', 'LOADED_VESSEL', 'VESSEL_TO_YARD'].includes(c.status)) return toast(`❌ Container already ${badge_text(c.status)} — cannot gate in again`, 'error');
     if (c.status !== 'PREADVISED') return toast(`❌ Container must be PREADVISED first. Current status: ${badge_text(c.status)}`, 'error');
     const slipNo = await nextSlipNo(); const ref = genRef();
     c.yard = yard; c.positionSlip = slipNo; c.plate = plate; c.transco = transco; c.transtype = transtype; c.clerk = clerk; c.gatedAt = Date.now();
@@ -654,76 +654,76 @@ function renderShifting() {
     document.getElementById('topShifted').innerHTML = Object.entries(byContainer).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id, n]) => { const c = findC(id); return `<div class="info-row"><span class="tbl-id" onclick="showDetail('${id}')">${id}</span><span class="font-bold">${n} shifts${c ? ` · ${c.line}` : ''}</span></div>`; }).join('') || '<span class="text-muted">No shifts recorded</span>';
 }
 
-// ═══ KEY SITE / PRE-STAKE ═══
-window.moveToKeysite = () => {
-    const id = tsGetValue('ks-move-id'); const bay = document.getElementById('ks-bay').value.trim(); const vessel = document.getElementById('ks-vessel').value.trim(); const voyage = document.getElementById('ks-voyage').value.trim(); const equip = document.getElementById('ks-equip').value.trim(); const clerk = document.getElementById('ks-clerk').value.trim() || currentUser || 'Clerk'; const remark = document.getElementById('ks-remark').value.trim();
+// ═══ QUAYSIDE / PRE-STAKE ═══
+window.moveToQuayside = () => {
+    const id = tsGetValue('qs-move-id'); const bay = document.getElementById('qs-bay').value.trim(); const vessel = document.getElementById('qs-vessel').value.trim(); const voyage = document.getElementById('qs-voyage').value.trim(); const equip = document.getElementById('qs-equip').value.trim(); const clerk = document.getElementById('qs-clerk').value.trim() || currentUser || 'Clerk'; const remark = document.getElementById('qs-remark').value.trim();
     if (!id) return toast('❌ Select a container', 'error');
     if (!clerk) return toast('❌ Pre-Stake Clerk name is required', 'error');
     const idx = findIdx(id); if (idx === -1) return toast('❌ Container not found', 'error');
     const c = DB.containers[idx];
     if (!['GATED_IN', 'RECEIVED_SGR', 'VESSEL_TO_YARD'].includes(c.status)) return toast(`❌ Container must be Gated In, Received SGR, or Vessel→Yard to pre-stake. Current: ${badge_text(c.status)}`, 'error');
     if (vessel && c.vessel && vessel.toUpperCase() !== c.vessel.toUpperCase() && !confirm(`Vessel mismatch: Container is for "${c.vessel}" but you entered "${vessel}". Proceed?`)) return;
-    c.ksBay = bay || 'KEY-SITE'; c.ksClerk = clerk;
+    c.qsBay = bay || 'QUAYSIDE'; c.qsClerk = clerk;
     if (vessel) c.vessel = vessel; if (voyage) c.voyage = voyage;
-    addMov(c, 'KEY_SITE', `Pre-staked to Key Site${bay ? ` Bay:${bay}` : ''} by ${clerk}${equip ? ` — Equip:${equip}` : ''}${remark ? ` — ${remark}` : ''}`);
-    log(id, 'KEY_SITE', `Bay:${bay || 'KEY-SITE'} Clerk:${clerk} Equip:${equip} Vessel:${vessel || c.vessel}`);
+    addMov(c, 'QUAYSIDE', `Pre-staked to Quayside${bay ? ` Bay:${bay}` : ''} by ${clerk}${equip ? ` — Equip:${equip}` : ''}${remark ? ` — ${remark}` : ''}`);
+    log(id, 'QUAYSIDE', `Bay:${bay || 'QUAYSIDE'} Clerk:${clerk} Equip:${equip} Vessel:${vessel || c.vessel}`);
     save(); renderAll(); updateNavBadges();
-    tsSetValue('ks-move-id', ''); document.getElementById('ks-bay').value = ''; document.getElementById('ks-vessel').value = ''; document.getElementById('ks-voyage').value = ''; document.getElementById('ks-equip').value = ''; document.getElementById('ks-clerk').value = ''; document.getElementById('ks-remark').value = ''; document.getElementById('ks-move-autofill').classList.add('hidden');
-    toast(`⚓ ${id} pre-staked to Key Site${bay ? ` (${bay})` : ''} by ${clerk}`, 'success');
+    tsSetValue('qs-move-id', ''); document.getElementById('qs-bay').value = ''; document.getElementById('qs-vessel').value = ''; document.getElementById('qs-voyage').value = ''; document.getElementById('qs-equip').value = ''; document.getElementById('qs-clerk').value = ''; document.getElementById('qs-remark').value = ''; document.getElementById('qs-move-autofill').classList.add('hidden');
+    toast(`⚓ ${id} pre-staked to Quayside${bay ? ` (${bay})` : ''} by ${clerk}`, 'success');
 };
-window.loadFromKeysite2 = async () => {
-    const id = tsGetValue('ks-load-id'); const clerk = document.getElementById('ks-load-clerk').value.trim() || currentUser || 'Clerk'; const bay = document.getElementById('ks-load-bay').value.trim(); const crane = document.getElementById('ks-load-crane').value.trim(); const remark = document.getElementById('ks-load-remark').value.trim();
-    if (!id) return toast('❌ Select a Key Site container', 'error');
+window.loadFromQuayside2 = async () => {
+    const id = tsGetValue('qs-load-id'); const clerk = document.getElementById('qs-load-clerk').value.trim() || currentUser || 'Clerk'; const bay = document.getElementById('qs-load-bay').value.trim(); const crane = document.getElementById('qs-load-crane').value.trim(); const remark = document.getElementById('qs-load-remark').value.trim();
+    if (!id) return toast('❌ Select a Quayside container', 'error');
     if (!clerk) return toast('❌ Loading Clerk name is required', 'error');
     const idx = findIdx(id); if (idx === -1) return toast('❌ Container not found', 'error');
     const c = DB.containers[idx];
-    if (c.status !== 'KEY_SITE') return toast('❌ Container must be at KEY_SITE to load from here', 'error');
-    const loadInfo = resolveLoadVessel('ks-load', c); if (!loadInfo) return;
+    if (c.status !== 'QUAYSIDE') return toast('❌ Container must be at QUAYSIDE to load from here', 'error');
+    const loadInfo = resolveLoadVessel('qs-load', c); if (!loadInfo) return;
     c.loaded = Date.now(); c.loadedBy = clerk; c.bay = bay;
     if (loadInfo.isRandom) {
-        await recordRandomLoad({ containerId: id, line: c.line, designatedVessel: c.vessel, designatedVoyage: c.voyage, actualVessel: loadInfo.actualVessel, actualVoyage: loadInfo.actualVoyage, reason: loadInfo.reason, clerk, remarks: remark, source: 'Key Site Direct Load' });
+        await recordRandomLoad({ containerId: id, line: c.line, designatedVessel: c.vessel, designatedVoyage: c.voyage, actualVessel: loadInfo.actualVessel, actualVoyage: loadInfo.actualVoyage, reason: loadInfo.reason, clerk, remarks: remark, source: 'Quayside Direct Load' });
     }
     addMov(c, 'LOADED_VESSEL', `Loaded to vessel by ${clerk}${bay ? ` Bay:${bay}` : ''}${crane ? ` Crane:${crane}` : ''}${remark ? ` — ${remark}` : ''}`);
-    log(id, 'LOADED_VESSEL', `Clerk:${clerk} Bay:${bay} Crane:${crane} (from Key Site)`);
+    log(id, 'LOADED_VESSEL', `Clerk:${clerk} Bay:${bay} Crane:${crane} (from Quayside)`);
     save(); renderAll(); updateNavBadges();
-    tsSetValue('ks-load-id', ''); document.getElementById('ks-load-clerk').value = ''; document.getElementById('ks-load-bay').value = ''; document.getElementById('ks-load-crane').value = ''; document.getElementById('ks-load-remark').value = ''; document.getElementById('ks-load-autofill').classList.add('hidden');
-    document.getElementById('ks-load-actual-vessel') && (document.getElementById('ks-load-actual-vessel').value = '');
-    document.getElementById('ks-load-actual-voyage') && (document.getElementById('ks-load-actual-voyage').value = '');
-    document.getElementById('ks-load-random-block')?.classList.add('hidden');
-    toast(`🛳️ ${id} loaded to vessel by ${clerk} from Key Site`, 'success');
+    tsSetValue('qs-load-id', ''); document.getElementById('qs-load-clerk').value = ''; document.getElementById('qs-load-bay').value = ''; document.getElementById('qs-load-crane').value = ''; document.getElementById('qs-load-remark').value = ''; document.getElementById('qs-load-autofill').classList.add('hidden');
+    document.getElementById('qs-load-actual-vessel') && (document.getElementById('qs-load-actual-vessel').value = '');
+    document.getElementById('qs-load-actual-voyage') && (document.getElementById('qs-load-actual-voyage').value = '');
+    document.getElementById('qs-load-random-block')?.classList.add('hidden');
+    toast(`🛳️ ${id} loaded to vessel by ${clerk} from Quayside`, 'success');
 };
-function renderKeysite() {
-    const srch = (document.getElementById('ksSearch')?.value || '').toLowerCase();
-    let arr = DB.containers.filter(c => c.status === 'KEY_SITE');
-    if (srch) arr = arr.filter(c => [c.id, c.line, c.vessel, c.ksBay, c.ksClerk].join(' ').toLowerCase().includes(srch));
-    const el = document.getElementById('keysiteBody');
+function renderQuayside() {
+    const srch = (document.getElementById('qsSearch')?.value || '').toLowerCase();
+    let arr = DB.containers.filter(c => c.status === 'QUAYSIDE');
+    if (srch) arr = arr.filter(c => [c.id, c.line, c.vessel, c.qsBay, c.qsClerk].join(' ').toLowerCase().includes(srch));
+    const el = document.getElementById('quaysideBody');
     el.innerHTML = arr.map(c => `<tr>
     <td><span class="tbl-id" onclick="showDetail('${c.id}')">${c.id}</span></td>
     <td>${c.line}</td><td>${c.type}</td><td>${c.vessel}</td><td>${c.voyage || '—'}</td>
-    <td><span class="code">${c.ksBay || 'KEY-SITE'}</span></td>
+    <td><span class="code">${c.qsBay || 'QUAYSIDE'}</span></td>
     <td>${sourceBadge(c.source)}</td><td>${c.positionSlip ? `<span class="code">${c.positionSlip}</span>` : '—'}</td>
     <td class="${dwellHours(c) > 96 ? 'overdue' : ''}">${dwellHours(c).toFixed(1)}h</td>
     <td class="${(c.shiftCount || 0) > 2 ? 'text-gold' : ''}">${c.shiftCount || 0}</td>
-    <td>${c.ksClerk || '—'}</td>
+    <td>${c.qsClerk || '—'}</td>
     <td><button class="btn btn-xs btn-primary" onclick="quickLoadVessel('${c.id}')">🛳️ Load</button></td>
-  </tr>`).join('') || '<tr><td colspan="12" class="text-muted" style="text-align:center;padding:2rem">No containers at Key Site</td></tr>';
-    document.getElementById('keysiteCount').textContent = `${arr.length} container${arr.length !== 1 ? 's' : ''}`;
+  </tr>`).join('') || '<tr><td colspan="12" class="text-muted" style="text-align:center;padding:2rem">No containers at Quayside</td></tr>';
+    document.getElementById('quaysideCount').textContent = `${arr.length} container${arr.length !== 1 ? 's' : ''}`;
 }
-window.quickLoadVessel = (id) => { tsSetValue('ks-load-id', id); keysiteLoadAutofill(); document.querySelector('#ks-load-clerk').focus(); };
-window.exportKeysiteCSV = () => { const arr = DB.containers.filter(c => c.status === 'KEY_SITE'); let csv = 'Container ID,Line,Type,Vessel,Voyage,KS Bay,Source,Dwell(h),Shifts,Clerk\n'; arr.forEach(c => { csv += `${c.id},${c.line},${c.type},${c.vessel},${c.voyage || ''},${c.ksBay || 'KEY-SITE'},${c.source},${dwellHours(c).toFixed(1)},${c.shiftCount || 0},${c.ksClerk || ''}\n`; }); dlFile(csv, 'text/csv', 'kpa_keysite.csv'); toast('📥 Key Site CSV exported', 'success'); };
-window.exportKeysitePDF = () => {
+window.quickLoadVessel = (id) => { tsSetValue('qs-load-id', id); quaysideLoadAutofill(); document.querySelector('#qs-load-clerk').focus(); };
+window.exportQuaysideCSV = () => { const arr = DB.containers.filter(c => c.status === 'QUAYSIDE'); let csv = 'Container ID,Line,Type,Vessel,Voyage,QS Bay,Source,Dwell(h),Shifts,Clerk\n'; arr.forEach(c => { csv += `${c.id},${c.line},${c.type},${c.vessel},${c.voyage || ''},${c.qsBay || 'QUAYSIDE'},${c.source},${dwellHours(c).toFixed(1)},${c.shiftCount || 0},${c.qsClerk || ''}\n`; }); dlFile(csv, 'text/csv', 'kpa_quayside.csv'); toast('📥 Quayside CSV exported', 'success'); };
+window.exportQuaysidePDF = () => {
     const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4');
-    doc.setFontSize(14); doc.text('KPA Pre-Stake / Key Site Report — Mombasa MCT', 14, 18);
+    doc.setFontSize(14); doc.text('KPA Pre-Stake / Quayside Report — Mombasa MCT', 14, 18);
     doc.setFontSize(8); doc.text(`Generated: ${new Date().toLocaleString()} · info@kpa.go.ke`, 14, 24);
-    const arr = DB.containers.filter(c => c.status === 'KEY_SITE');
-    doc.autoTable({ head: [['Container ID', 'Line', 'Type', 'Vessel', 'Voyage', 'KS Bay', 'Source', 'Dwell(h)', 'Shifts', 'Clerk']], body: arr.map(c => [c.id, c.line, c.type, c.vessel, c.voyage || '', c.ksBay || 'KEY-SITE', c.source, dwellHours(c).toFixed(1), c.shiftCount || 0, c.ksClerk || '']), startY: 30, styles: { fontSize: 7 }, headStyles: { fillColor: [2, 132, 199] }, alternateRowStyles: { fillColor: [240, 249, 255] } });
-    doc.save('kpa_keysite_report.pdf'); toast('📄 Key Site PDF exported', 'success');
+    const arr = DB.containers.filter(c => c.status === 'QUAYSIDE');
+    doc.autoTable({ head: [['Container ID', 'Line', 'Type', 'Vessel', 'Voyage', 'QS Bay', 'Source', 'Dwell(h)', 'Shifts', 'Clerk']], body: arr.map(c => [c.id, c.line, c.type, c.vessel, c.voyage || '', c.qsBay || 'QUAYSIDE', c.source, dwellHours(c).toFixed(1), c.shiftCount || 0, c.qsClerk || '']), startY: 30, styles: { fontSize: 7 }, headStyles: { fillColor: [2, 132, 199] }, alternateRowStyles: { fillColor: [240, 249, 255] } });
+    doc.save('kpa_quayside_report.pdf'); toast('📄 Quayside PDF exported', 'success');
 };
 
 // ═══ RANDOM LOADING — shared capture logic ═══
 // A "random load" is when a container is loaded onto a vessel/voyage different from its
 // designated (pre-advised) vessel. Captured automatically from Yard (direct-to-vessel),
-// Key Site (direct load) and Vessel Loading, and can also be flagged retroactively.
+// Quayside (direct load) and Vessel Loading, and can also be flagged retroactively.
 async function recordRandomLoad({ containerId, line, designatedVessel, designatedVoyage, actualVessel, actualVoyage, reason, clerk, remarks, source }) {
     DB.randomLoads.unshift({
         id: await nextRandomId(), containerId, line: line || '',
@@ -756,7 +756,7 @@ function resolveLoadVessel(prefix, c) {
 // Shows/hides the orange "random loading detected" block for a form prefix as the actual-vessel
 // input is typed, by comparing it live against the selected container's designated vessel.
 window.checkRandomLoadUI = (prefix) => {
-    const idField = prefix === 'ks-load' ? 'ks-load-id' : prefix + '-id';
+    const idField = prefix === 'qs-load' ? 'qs-load-id' : prefix + '-id';
     const c = findC(tsGetValue(idField));
     const actualInput = document.getElementById(prefix + '-actual-vessel');
     const block = document.getElementById(prefix + '-random-block');
@@ -869,7 +869,7 @@ window.loadVessel = async () => {
     if (!clerk || clerk === 'Unassigned') return toast('❌ Loading Clerk name is required', 'error');
     const idx = findIdx(id); if (idx === -1) return toast('❌ Container not found', 'error');
     const c = DB.containers[idx];
-    if (!['KEY_SITE', 'GATED_IN', 'RECEIVED_SGR', 'VESSEL_TO_YARD'].includes(c.status)) return toast(`❌ Container status must be Key Site, Gated In, or Received SGR. Current: ${badge_text(c.status)}`, 'error');
+    if (!['QUAYSIDE', 'GATED_IN', 'RECEIVED_SGR', 'VESSEL_TO_YARD'].includes(c.status)) return toast(`❌ Container status must be Quayside, Gated In, or Received SGR. Current: ${badge_text(c.status)}`, 'error');
     const loadInfo = resolveLoadVessel('v', c); if (!loadInfo) return;
     c.loaded = Date.now(); c.loadedBy = clerk; c.bay = bay;
     if (loadInfo.isRandom) {
@@ -892,7 +892,7 @@ window.recordShutout = async () => {
     const c = DB.containers[idx];
     const so = { id: await nextShutoutId(), containerId: id, line: c.line, vessel: c.vessel, voyage: c.voyage, source: c.source, reason, clerk, nextAction: action, remarks: remark, shutoutAt: Date.now(), currentStatus: c.status };
     DB.shutouts.push(so); c.shutout = true;
-    if (action === 'Return to Yard' && c.status === 'KEY_SITE') addMov(c, 'GATED_IN', `Shutout: ${reason} — returned to yard`);
+    if (action === 'Return to Yard' && c.status === 'QUAYSIDE') addMov(c, 'GATED_IN', `Shutout: ${reason} — returned to yard`);
     else addMov(c, c.status, `Shutout recorded: ${reason}. Next action: ${action}`);
     log(id, 'SHUTOUT', `Vessel:${c.vessel} Reason:${reason} Clerk:${clerk}`);
     save(); renderAll(); updateNavBadges();
@@ -926,9 +926,9 @@ function renderSGR() {
 // ═══ DETAIL MODAL ═══
 window.showDetail = (id) => {
     const c = findC(id); if (!c) return;
-    const fD = ['PREADVISED', 'GATED_IN', 'KEY_SITE', 'LOADED_VESSEL'];
-    const fI = ['PREADVISED', 'ON_WAGON', 'RECEIVED_SGR', 'GATED_IN', 'KEY_SITE', 'LOADED_VESSEL'];
-    const fV = ['PREADVISED', 'VESSEL_TO_YARD', 'KEY_SITE', 'LOADED_VESSEL'];
+    const fD = ['PREADVISED', 'GATED_IN', 'QUAYSIDE', 'LOADED_VESSEL'];
+    const fI = ['PREADVISED', 'ON_WAGON', 'RECEIVED_SGR', 'GATED_IN', 'QUAYSIDE', 'LOADED_VESSEL'];
+    const fV = ['PREADVISED', 'VESSEL_TO_YARD', 'QUAYSIDE', 'LOADED_VESSEL'];
     const flow = c.source === 'ICD' ? fI : c.source === 'Vessel' ? fV : fD; const ci = flow.indexOf(c.status);
     const wfHTML = flow.map((s, i) => { const done = i < ci; const active = i === ci; return `<span class="wf-step ${done ? 'wf-done' : active ? 'wf-active' : 'wf-pending'}">${done ? '✅' : active ? '🔄' : '○'} ${s.replace(/_/g, ' ')}</span>${i < flow.length - 1 ? '<span class="wf-arrow">→</span>' : ''}` }).join('');
     const cShifts = DB.shifts.filter(s => s.containerId === id);
@@ -944,7 +944,7 @@ window.showDetail = (id) => {
       <div class="info-row"><span class="text-muted">Type / ISO</span><span>${c.type} / ${c.iso || c.type}</span></div>
       <div class="info-row"><span class="text-muted">POD</span><span>${c.pod || '—'}</span></div>
       <div class="info-row"><span class="text-muted">Yard / Block</span><span>${c.yard || '—'}</span></div>
-      <div class="info-row"><span class="text-muted">Key Site Bay</span><span>${c.ksBay || '—'}</span></div>
+      <div class="info-row"><span class="text-muted">Quayside Bay</span><span>${c.qsBay || '—'}</span></div>
       <div class="info-row"><span class="text-muted">Slip No.</span><span class="code">${c.positionSlip || '—'}</span></div>
       <div class="info-row"><span class="text-muted">Dwell</span><span>${dwellHours(c).toFixed(1)}h</span></div>
       <div class="info-row"><span class="text-muted">Free Period</span><span>${getFreeTimeDays(c.source)} days</span></div>
@@ -1018,7 +1018,7 @@ window.pdfSlip = () => { if (lastSlipData) generateSlipPDF(lastSlipData.slip, la
 // ═══ RENDER ALL ═══
 function renderAll() {
     populateAllDropdowns();
-    renderDashboard(); renderTable(); renderSlips(); renderKeysite(); renderVessel(); renderSGR(); renderYardBlocks(); renderLogs(); renderShifting(); renderShutouts(); renderVesselYardTable(); renderRandomLoading();
+    renderDashboard(); renderTable(); renderSlips(); renderQuayside(); renderVessel(); renderSGR(); renderYardBlocks(); renderLogs(); renderShifting(); renderShutouts(); renderVesselYardTable(); renderRandomLoading();
     if (document.getElementById('tab-reports')?.classList.contains('active')) renderReports();
     renderImportStats(); renderImportTable(); renderImportCharts();
 }
@@ -1036,7 +1036,7 @@ function renderDashboard() {
     const total = cs.length;
     const pa = cs.filter(c => c.status === 'PREADVISED').length;
     const gated = cs.filter(c => c.status === 'GATED_IN').length;
-    const ks = cs.filter(c => c.status === 'KEY_SITE').length;
+    const qs = cs.filter(c => c.status === 'QUAYSIDE').length;
     const loaded = cs.filter(c => c.status === 'LOADED_VESSEL').length;
     const sgrCount = cs.filter(c => c.source === 'ICD' && !['LOADED_VESSEL', 'OUT_OF_PORT'].includes(c.status)).length;
     const vty = cs.filter(c => c.status === 'VESSEL_TO_YARD').length;
@@ -1119,7 +1119,7 @@ function renderDashboard() {
     if (kpiEl) kpiEl.innerHTML = [
         { label: 'Total containers', val: total, sub: `${inPort} currently in port`, accent: 'var(--accent)', cls: '' },
         { label: 'Gated in', val: gated, sub: `${slips} position slips issued`, accent: '#1D9E75', cls: 'dv2-kpi-success' },
-        { label: 'Key site / Pre-stake', val: ks, sub: 'Ready for vessel load', accent: '#BA7517', cls: ks > 0 ? 'dv2-kpi-warn' : '' },
+        { label: 'Quayside / Pre-stake', val: qs, sub: 'Ready for vessel load', accent: '#BA7517', cls: qs > 0 ? 'dv2-kpi-warn' : '' },
         { label: 'Overdue free time', val: overdue.length, sub: `${nearExpiry.length} near expiry (<48h)`, accent: overdue.length > 0 ? '#E24B4A' : '#1D9E75', cls: overdue.length > 0 ? 'dv2-kpi-danger' : '' },
     ].map(k => `
     <div class="dv2-kpi ${k.cls}">
@@ -1180,7 +1180,7 @@ function renderDashboard() {
                 const lcs = cs.filter(c => c.line === line);
                 const lPa = lcs.filter(c => c.status === 'PREADVISED').length;
                 const lGated = lcs.filter(c => c.status === 'GATED_IN').length;
-                const lKs = lcs.filter(c => c.status === 'KEY_SITE').length;
+                const lKs = lcs.filter(c => c.status === 'QUAYSIDE').length;
                 const lLoaded = lcs.filter(c => c.status === 'LOADED_VESSEL').length;
                 const lSgr = lcs.filter(c => c.source === 'ICD').length;
                 const lActive = lcs.filter(c => !['LOADED_VESSEL', 'OUT_OF_PORT'].includes(c.status));
@@ -1227,8 +1227,8 @@ function renderDashboard() {
     document.getElementById('wfSnapshot').innerHTML = Object.entries(STATUS_META).map(([s, m]) => `<div class="info-row"><span>${m.icon} ${m.label}</span><span class="font-bold" style="min-width:28px;text-align:right">${statusCounts[s] || 0}</span></div>`).join('');
 
     // ── Vessels in play ──
-    const vesselMap = {}; cs.filter(c => c.vessel && !['OUT_OF_PORT'].includes(c.status)).forEach(c => { if (!vesselMap[c.vessel]) vesselMap[c.vessel] = { total: 0, loaded: 0, ks: 0 }; vesselMap[c.vessel].total++; if (c.status === 'LOADED_VESSEL') vesselMap[c.vessel].loaded++; if (c.status === 'KEY_SITE') vesselMap[c.vessel].ks++; });
-    document.getElementById('vesselSnapshot').innerHTML = Object.entries(vesselMap).slice(0, 5).map(([v, d]) => `<div class="info-row"><span class="text-sm">${v}</span><span class="text-xs"><span class="text-success">${d.loaded}✓</span> <span style="color:var(--orange)">${d.ks}⚓</span> <span class="text-muted">${d.total} tot</span></span></div>`).join('') || '<span class="text-muted text-sm">No active vessels</span>';
+    const vesselMap = {}; cs.filter(c => c.vessel && !['OUT_OF_PORT'].includes(c.status)).forEach(c => { if (!vesselMap[c.vessel]) vesselMap[c.vessel] = { total: 0, loaded: 0, qs: 0 }; vesselMap[c.vessel].total++; if (c.status === 'LOADED_VESSEL') vesselMap[c.vessel].loaded++; if (c.status === 'QUAYSIDE') vesselMap[c.vessel].qs++; });
+    document.getElementById('vesselSnapshot').innerHTML = Object.entries(vesselMap).slice(0, 5).map(([v, d]) => `<div class="info-row"><span class="text-sm">${v}</span><span class="text-xs"><span class="text-success">${d.loaded}✓</span> <span style="color:var(--orange)">${d.qs}⚓</span> <span class="text-muted">${d.total} tot</span></span></div>`).join('') || '<span class="text-muted text-sm">No active vessels</span>';
 
     // ── Recent activity ──
     document.getElementById('recentActivity').innerHTML = DB.logs.slice(0, 12).map(l => `<div class="info-row"><span><span class="code">${l.containerId}</span> <span class="text-xs" style="color:var(--accent)">${l.action}</span></span><span class="text-xs text-muted">${timeAgo(l.time)}</span></div>`).join('') || '<span class="text-muted text-sm">No recent activity</span>';
@@ -1309,20 +1309,20 @@ window.exportDashboardPDF = () => {
     doc.setFontSize(9);
     const total = DB.containers.length;
     const gated = DB.containers.filter(c => c.status === 'GATED_IN').length;
-    const ks = DB.containers.filter(c => c.status === 'KEY_SITE').length;
+    const qs = DB.containers.filter(c => c.status === 'QUAYSIDE').length;
     const loaded = DB.containers.filter(c => c.status === 'LOADED_VESSEL').length;
     const active = DB.containers.filter(c => !['LOADED_VESSEL', 'OUT_OF_PORT'].includes(c.status));
     const overdue = active.filter(c => freeDaysLeft(c) < 0).length;
-    doc.text(`Total Containers: ${total}`, 14, 40); doc.text(`Gated In: ${gated}`, 14, 48); doc.text(`Key Site: ${ks}`, 14, 56); doc.text(`Loaded to Vessel: ${loaded}`, 14, 64); doc.text(`Overdue Free Time: ${overdue}`, 14, 72);
+    doc.text(`Total Containers: ${total}`, 14, 40); doc.text(`Gated In: ${gated}`, 14, 48); doc.text(`Quayside: ${qs}`, 14, 56); doc.text(`Loaded to Vessel: ${loaded}`, 14, 64); doc.text(`Overdue Free Time: ${overdue}`, 14, 72);
 
     // Line summary
     const lines = [...new Set(DB.containers.map(c => c.line))].filter(Boolean).sort();
     const lineBody = lines.map(line => {
         const lcs = DB.containers.filter(c => c.line === line);
         const lActive = lcs.filter(c => !['LOADED_VESSEL', 'OUT_OF_PORT'].includes(c.status));
-        return [line, lcs.length, lcs.filter(c => c.status === 'GATED_IN').length, lcs.filter(c => c.status === 'KEY_SITE').length, lcs.filter(c => c.status === 'LOADED_VESSEL').length, lActive.filter(c => freeDaysLeft(c) < 0).length];
+        return [line, lcs.length, lcs.filter(c => c.status === 'GATED_IN').length, lcs.filter(c => c.status === 'QUAYSIDE').length, lcs.filter(c => c.status === 'LOADED_VESSEL').length, lActive.filter(c => freeDaysLeft(c) < 0).length];
     });
-    if (lineBody.length) { doc.autoTable({ startY: 80, head: [['Line', 'Total', 'Gated', 'Key Site', 'Loaded', 'Overdue']], body: lineBody, styles: { fontSize: 8 }, headStyles: { fillColor: [2, 132, 199] } }); }
+    if (lineBody.length) { doc.autoTable({ startY: 80, head: [['Line', 'Total', 'Gated', 'Quayside', 'Loaded', 'Overdue']], body: lineBody, styles: { fontSize: 8 }, headStyles: { fillColor: [2, 132, 199] } }); }
 
     const overdueList = active.filter(c => freeDaysLeft(c) < 0).slice(0, 15);
     if (overdueList.length) { const startY = doc.lastAutoTable?.finalY || 140; doc.autoTable({ startY: startY + 8, head: [['Container ID', 'Line', 'Status', 'Overdue (h)']], body: overdueList.map(c => [c.id, c.line, c.status, Math.abs(freeDaysLeft(c)).toFixed(1)]), styles: { fontSize: 7 }, headStyles: { fillColor: [220, 38, 38] } }); }
@@ -1500,7 +1500,7 @@ function switchReportTab(tab, ev) {
 function renderReports() {
     const vesselFilter = tsGetValue('rpt-vessel'); const lineFilter = tsGetValue('rpt-line'); const sourceFilter = tsGetValue('rpt-source'); const statusFilter = tsGetValue('rpt-status');
     let filtered = DB.containers.filter(c => { if (vesselFilter && c.vessel !== vesselFilter) return false; if (lineFilter && c.line !== lineFilter) return false; if (sourceFilter && c.source !== sourceFilter) return false; if (statusFilter && c.status !== statusFilter) return false; return true; });
-    const kpis = { 'Total Containers': filtered.length, 'Gated In': filtered.filter(c => c.status === 'GATED_IN').length, 'Key Site': filtered.filter(c => c.status === 'KEY_SITE').length, 'Loaded': filtered.filter(c => c.status === 'LOADED_VESSEL').length, 'Avg Dwell (h)': (filtered.reduce((a, c) => a + dwellHours(c), 0) / filtered.length || 0).toFixed(1) };
+    const kpis = { 'Total Containers': filtered.length, 'Gated In': filtered.filter(c => c.status === 'GATED_IN').length, 'Quayside': filtered.filter(c => c.status === 'QUAYSIDE').length, 'Loaded': filtered.filter(c => c.status === 'LOADED_VESSEL').length, 'Avg Dwell (h)': (filtered.reduce((a, c) => a + dwellHours(c), 0) / filtered.length || 0).toFixed(1) };
     document.getElementById('rpt-kpi-row').innerHTML = Object.entries(kpis).map(([k, v]) => `<div class="report-kpi"><div class="rk-val">${v}</div><div class="rk-lbl">${k}</div></div>`).join('');
     const statusCounts = {}; filtered.forEach(c => statusCounts[c.status] = (statusCounts[c.status] || 0) + 1);
     const ctxStatus = document.getElementById('chartStatus')?.getContext('2d'); if (ctxStatus) { if (reportCharts.status) reportCharts.status.destroy(); reportCharts.status = new Chart(ctxStatus, { type: 'bar', data: { labels: Object.keys(statusCounts).map(s => STATUS_META[s]?.label || s), datasets: [{ label: 'Containers', data: Object.values(statusCounts), backgroundColor: '#38bdf8' }] }, options: { responsive: true, maintainAspectRatio: true } }); }
@@ -1512,7 +1512,7 @@ function renderReports() {
     const ctxGated = document.getElementById('chartGatedVessel')?.getContext('2d'); if (ctxGated) { if (reportCharts.gated) reportCharts.gated.destroy(); reportCharts.gated = new Chart(ctxGated, { type: 'bar', data: { labels: Object.keys(vesselGated), datasets: [{ label: 'Gated In', data: Object.values(vesselGated), backgroundColor: '#0ea5e9' }] }, options: { responsive: true } }); }
     const ctxLoaded = document.getElementById('chartLoaded')?.getContext('2d'); if (ctxLoaded) { if (reportCharts.loaded) reportCharts.loaded.destroy(); reportCharts.loaded = new Chart(ctxLoaded, { type: 'bar', data: { labels: Object.keys(vesselLoaded), datasets: [{ label: 'Loaded', data: Object.values(vesselLoaded), backgroundColor: '#34d399' }] }, options: { responsive: true } }); }
     document.getElementById('rpt-container-tbody').innerHTML = filtered.slice(0, 100).map(c => `<tr><td>${c.id}</td><td>${c.line}</td><td>${c.vessel}</td><td>${c.type}</td><td>${c.source}</td><td>${badge(c.status)}</td><td>${c.yard || '—'}</td><td>${dwellHours(c).toFixed(1)}</td><td>${freeTimeDisplay(c)}</td><td>${c.shiftCount || 0}</td><td>${c.positionSlip || '—'}</td></tr>`).join('') || '<tr><td colspan="11">No containers match filters</td></tr>';
-    document.getElementById('rpt-vessel-tbody').innerHTML = [...new Set(filtered.map(c => c.vessel))].map(v => { const gatedCnt = filtered.filter(c => c.vessel === v && c.status === 'GATED_IN').length; const ksCnt = filtered.filter(c => c.vessel === v && c.status === 'KEY_SITE').length; const loadedCnt = filtered.filter(c => c.vessel === v && c.status === 'LOADED_VESSEL').length; const shutCnt = filtered.filter(c => c.vessel === v && c.shutout).length; const rate = loadedCnt ? ((loadedCnt / (loadedCnt + shutCnt)) * 100).toFixed(1) : 0; return `<tr><td>${v}</td><td>${gatedCnt}</td><td>${ksCnt}</td><td>${loadedCnt}</td><td>${shutCnt}</td><td>${rate}%</td></tr>`; }).join('');
+    document.getElementById('rpt-vessel-tbody').innerHTML = [...new Set(filtered.map(c => c.vessel))].map(v => { const gatedCnt = filtered.filter(c => c.vessel === v && c.status === 'GATED_IN').length; const qsCnt = filtered.filter(c => c.vessel === v && c.status === 'QUAYSIDE').length; const loadedCnt = filtered.filter(c => c.vessel === v && c.status === 'LOADED_VESSEL').length; const shutCnt = filtered.filter(c => c.vessel === v && c.shutout).length; const rate = loadedCnt ? ((loadedCnt / (loadedCnt + shutCnt)) * 100).toFixed(1) : 0; return `<tr><td>${v}</td><td>${gatedCnt}</td><td>${qsCnt}</td><td>${loadedCnt}</td><td>${shutCnt}</td><td>${rate}%</td></tr>`; }).join('');
     const clerkStats = {}; filtered.filter(c => c.loadedBy).forEach(c => clerkStats[c.loadedBy] = (clerkStats[c.loadedBy] || 0) + 1);
     document.getElementById('clerkTable').innerHTML = Object.entries(clerkStats).sort((a, b) => b[1] - a[1]).map(([name, count]) => `<div class="info-row"><span>${name}</span><span class="font-bold text-accent">${count}</span></div>`).join('') || '<span class="text-muted">No loading clerks recorded</span>';
     const gateClerks = {}; DB.slips.forEach(s => { if (s.clerk) gateClerks[s.clerk] = (gateClerks[s.clerk] || 0) + 1; });
@@ -1538,7 +1538,7 @@ function renderReports() {
     document.getElementById('randomStatsRpt').innerHTML = `<div class="info-row"><span>Total Random Loads</span><span class="font-bold text-gold">${DB.randomLoads.length}</span></div><div class="info-row"><span>Unique Containers</span><span class="font-bold">${new Set(DB.randomLoads.map(r => r.containerId)).size}</span></div><div class="info-row"><span>Unique Vessels Involved</span><span class="font-bold">${new Set(DB.randomLoads.map(r => r.actualVessel)).size}</span></div>`;
     document.getElementById('rpt-random-tbody').innerHTML = DB.randomLoads.slice(0, 100).map(r => `<tr><td>${r.containerId}</td><td>${r.line || '—'}</td><td>${r.designatedVessel || '—'}</td><td>${r.actualVessel || '—'}</td><td>${r.reason || '—'}</td><td>${r.clerk || '—'}</td><td>${new Date(r.recordedAt).toLocaleString()}</td></tr>`).join('') || '<tr><td colspan="7">No random loading records</td></tr>';
 }
-function exportFullReportPDF() { const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); doc.setFontSize(16); doc.text('KPA Terminal Full Performance Report', 14, 20); doc.setFontSize(9); doc.text(`Generated: ${new Date().toLocaleString()} by ${currentUser}`, 14, 28); const total = DB.containers.length; const loaded = DB.containers.filter(c => c.status === 'LOADED_VESSEL').length; const shutouts = DB.shutouts.length; doc.text(`Total Containers: ${total}   Loaded: ${loaded}   Shutouts: ${shutouts}`, 14, 40); doc.autoTable({ head: [['Vessel', 'Gated', 'Key Site', 'Loaded', 'Shutouts']], body: [...new Set(DB.containers.map(c => c.vessel))].map(v => { const gated = DB.containers.filter(c => c.vessel === v && c.status === 'GATED_IN').length; const ks = DB.containers.filter(c => c.vessel === v && c.status === 'KEY_SITE').length; const ld = DB.containers.filter(c => c.vessel === v && c.status === 'LOADED_VESSEL').length; const so = DB.shutouts.filter(s => s.vessel === v).length; return [v, gated, ks, ld, so]; }), startY: 50, styles: { fontSize: 7 }, headStyles: { fillColor: [2, 132, 199] } }); doc.save('kpa_full_report.pdf'); toast('📄 Full PDF report generated', 'success'); }
+function exportFullReportPDF() { const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); doc.setFontSize(16); doc.text('KPA Terminal Full Performance Report', 14, 20); doc.setFontSize(9); doc.text(`Generated: ${new Date().toLocaleString()} by ${currentUser}`, 14, 28); const total = DB.containers.length; const loaded = DB.containers.filter(c => c.status === 'LOADED_VESSEL').length; const shutouts = DB.shutouts.length; doc.text(`Total Containers: ${total}   Loaded: ${loaded}   Shutouts: ${shutouts}`, 14, 40); doc.autoTable({ head: [['Vessel', 'Gated', 'Quayside', 'Loaded', 'Shutouts']], body: [...new Set(DB.containers.map(c => c.vessel))].map(v => { const gated = DB.containers.filter(c => c.vessel === v && c.status === 'GATED_IN').length; const qs = DB.containers.filter(c => c.vessel === v && c.status === 'QUAYSIDE').length; const ld = DB.containers.filter(c => c.vessel === v && c.status === 'LOADED_VESSEL').length; const so = DB.shutouts.filter(s => s.vessel === v).length; return [v, gated, qs, ld, so]; }), startY: 50, styles: { fontSize: 7 }, headStyles: { fillColor: [2, 132, 199] } }); doc.save('kpa_full_report.pdf'); toast('📄 Full PDF report generated', 'success'); }
 
 // ═══ NAV & EVENT BINDINGS ═══
 document.querySelectorAll('.nav-item, .mob-item').forEach(el => {
@@ -1554,7 +1554,7 @@ document.querySelectorAll('.nav-item, .mob-item').forEach(el => {
         if (tab === 'position-slips') renderSlips();
         if (tab === 'shifting') renderShifting();
         if (tab === 'shutouts') renderShutouts();
-        if (tab === 'keysite') renderKeysite();
+        if (tab === 'quayside') renderQuayside();
         if (tab === 'sgr') renderSGR();
         if (tab === 'vessel-to-yard') renderVesselYardTable();
         if (tab === 'yard') renderYardBlocks();
@@ -1565,7 +1565,8 @@ document.querySelectorAll('.nav-item, .mob-item').forEach(el => {
 });
 
 window.addEventListener('load', () => {
-    showLanding();
+    const authParam = new URLSearchParams(window.location.search).get('auth');
+    if (authParam === 'signin' || authParam === 'signup') { showAuth(authParam); } else { showLanding(); }
     const dz = document.getElementById('bulkDZ');
     if (dz) { dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); }); dz.addEventListener('dragleave', () => dz.classList.remove('drag-over')); dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); const file = e.dataTransfer.files[0]; if (file && file.name.endsWith('.csv')) { handleBulkFile({ target: { files: [file] } }); } else toast('Please drop a CSV file', 'error'); }); }
     const impDz = document.getElementById('importBulkDZ');
