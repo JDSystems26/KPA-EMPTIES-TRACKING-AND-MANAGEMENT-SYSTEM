@@ -3680,3 +3680,198 @@ footer {
         align-items: flex-start;
     }
 }
+
+/* ═══════════════════════════════════════════════════════
+   CINEMATIC MOTION — Ken Burns hero/photo-break crossfades,
+   scroll reveals, figure hover zoom
+   ═══════════════════════════════════════════════════════ */
+
+.mag-hero {
+    overflow: hidden;
+}
+
+.hero-layer {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    will-change: transform, opacity;
+}
+
+.hero-layer-a {
+    animation: kenburnsA 30s ease-in-out infinite alternate, heroCrossfadeA 17s ease-in-out infinite;
+}
+
+.hero-layer-b {
+    animation: kenburnsB 34s ease-in-out infinite alternate, heroCrossfadeB 17s ease-in-out infinite;
+}
+
+@keyframes kenburnsA {
+    0% {
+        transform: scale(1) translate(0,0);
+    }
+
+    100% {
+        transform: scale(1.15) translate(-2.2%,-1.4%);
+    }
+}
+
+@keyframes kenburnsB {
+    0% {
+        transform: scale(1.1) translate(1.4%,1%);
+    }
+
+    100% {
+        transform: scale(1.22) translate(-1%,0%);
+    }
+}
+
+@keyframes heroCrossfadeA {
+    0%, 42% {
+        opacity: 1;
+    }
+
+    50%, 92% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes heroCrossfadeB {
+    0%, 42% {
+        opacity: 0;
+    }
+
+    50%, 92% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+/* the dark gradient/overlay must sit above both photo layers */
+.mag-hero-media.hero-layer + .hero-layer + .mag-hero-inner,
+.mag-hero-inner {
+    position: relative;
+    z-index: 2;
+}
+
+.mag-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(180deg, rgba(4,8,15,0.35) 0%, rgba(4,8,15,0.55) 42%, rgba(4,8,15,0.94) 88%, var(--navy) 100%), linear-gradient(90deg, rgba(4,8,15,0.75) 0%, rgba(4,8,15,0.15) 55%);
+    pointer-events: none;
+}
+/* legacy single-layer overlay no longer needed once ::before handles it */
+.mag-hero-media::after {
+    content: none;
+}
+
+/* ── Photo-break: separated media layer so text/caption never scales ── */
+.mag-photo-break {
+    overflow: hidden;
+}
+
+.mag-photo-break-media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-size: cover;
+    background-position: center;
+    animation: kenburnsA 26s ease-in-out infinite alternate;
+    will-change: transform;
+}
+
+.mag-photo-break::after {
+    z-index: 1;
+}
+
+.mag-photo-break-cap {
+    position: relative;
+    z-index: 2;
+}
+
+/* ── Figure hover zoom ── */
+.mag-figure img {
+    transition: transform 0.9s cubic-bezier(.16,.84,.44,1);
+}
+
+.mag-figure:hover img {
+    transform: scale(1.06);
+}
+
+/* ── Scroll reveal ── */
+.reveal-target {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.9s cubic-bezier(.16,.84,.44,1), transform 0.9s cubic-bezier(.16,.84,.44,1);
+}
+
+    .reveal-target.in-view {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+/* ── Cinematic hero text entrance ── */
+.mag-kicker, .mag-hero-h1, .mag-hero-sub, .mag-hero-row {
+    animation: heroTextIn 1s cubic-bezier(.16,.84,.44,1) both;
+}
+
+.mag-kicker {
+    animation-delay: 0.05s;
+}
+
+.mag-hero-h1 {
+    animation-delay: 0.16s;
+}
+
+.mag-hero-sub {
+    animation-delay: 0.32s;
+}
+
+.mag-hero-row {
+    animation-delay: 0.48s;
+}
+
+@keyframes heroTextIn {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-layer, .mag-photo-break-media, .mag-kicker, .mag-hero-h1, .mag-hero-sub, .mag-hero-row {
+        animation: none !important;
+    }
+
+    .hero-layer-a {
+        opacity: 1;
+    }
+
+    .hero-layer-b {
+        opacity: 0;
+    }
+
+    .mag-figure img {
+        transition: none;
+    }
+
+    .reveal-target {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}

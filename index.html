@@ -33,11 +33,12 @@
 
         <!-- HERO -->
         <header class="mag-hero">
-            <div class="mag-hero-media" style="background-image:url('https://images.unsplash.com/photo-1759216373394-91146ca977c7?auto=format&amp;fit=crop&amp;w=2400&amp;q=70')"></div>
+            <div class="hero-layer hero-layer-a" style="background-image:url('https://images.unsplash.com/photo-1759216373394-91146ca977c7?auto=format&amp;fit=crop&amp;w=2400&amp;q=70')"></div>
+            <div class="hero-layer hero-layer-b" style="background-image:url('https://images.unsplash.com/photo-1759216373582-a24c4a65b031?auto=format&amp;fit=crop&amp;w=2400&amp;q=70')"></div>
             <div class="mag-hero-inner">
-             <!-- <div class="mag-kicker">Mombasa MCT &nbsp;·&nbsp; Terminal Operations</div>
-              <!--  <h1 class="mag-hero-h1">Every container.<br>One record.<br><em>Zero guesswork.</em></h1>-->
-                <p class="mag-hero-sub">Management and tracking system for empty‑container gate‑in, yard, quayside, SGR rail and vessel loading operations at Containers Terminals— built so a container's status is never a matter of who you called last.</p>
+                <div class="mag-kicker">Mombasa MCT &nbsp;·&nbsp; Terminal Operations</div>
+                <h1 class="mag-hero-h1">Every container.<br>One record.<br><em>Zero guesswork.</em></h1>
+                <p class="mag-hero-sub">Management and tracking system for empty‑container gate‑in, yard, quayside, SGR rail and vessel loading operations at Kenya Ports Authority's Empty Containers Terminal — built so a container's status is never a matter of who you called last.</p>
                 <div class="mag-hero-row">
                     <div class="mag-hero-cta">
                         <button class="lp-btn-primary" onclick="showAuth('signin')">Access Portal</button>
@@ -60,12 +61,12 @@
                         <div class="mag-section-head"><span class="mag-section-num">01</span><h2>A single source of truth</h2></div>
                         <p class="mag-lede mag-dropcap">Gate clerks, yard controllers, quayside operators, SGR rail staff and vessel loading teams have historically worked from separate log books, radios and memory. ECOMS gives every role the same live container record — checked once, trusted at every stage downstream.</p>
                         <div class="mag-index-grid">
-                            <div class="mag-index-item"><span class="mag-index-ic"></span><div><h4>Pre‑advice &amp; Gate In</h4><p>Registered before arrival, captured once at the barrier.</p></div></div>
-                            <div class="mag-index-item"><span class="mag-index-ic"></span><div><h4>Yard &amp; Quayside staging</h4><p>Location and clerk logged the moment it happens.</p></div></div>
-                            <div class="mag-index-item"><span class="mag-index-ic"></span><div><h4>SGR Rail integration</h4><p>Received off rail into the same live record.</p></div></div>
-                            <div class="mag-index-item"><span class="mag-index-ic"></span><div><h4>Vessel Loading</h4><p>Random‑load detection built into every load.</p></div></div>
-                            <div class="mag-index-item"><span class="mag-index-ic"></span><div><h4>Shifting &amp; Shutouts</h4><p>Every move and every miss is tracked.</p></div></div>
-                            <div class="mag-index-item"><span class="mag-index-ic"></span><div><h4>Reports &amp; exports</h4><p>Compliance reporting is an export, not a reconstruction.</p></div></div>
+                            <div class="mag-index-item"><span class="mag-index-ic">📋</span><div><h4>Pre‑advice &amp; Gate In</h4><p>Registered before arrival, captured once at the barrier.</p></div></div>
+                            <div class="mag-index-item"><span class="mag-index-ic">🏗️</span><div><h4>Yard &amp; Quayside staging</h4><p>Location and clerk logged the moment it happens.</p></div></div>
+                            <div class="mag-index-item"><span class="mag-index-ic">🚂</span><div><h4>SGR Rail integration</h4><p>Received off rail into the same live record.</p></div></div>
+                            <div class="mag-index-item"><span class="mag-index-ic">🛳️</span><div><h4>Vessel Loading</h4><p>Random‑load detection built into every load.</p></div></div>
+                            <div class="mag-index-item"><span class="mag-index-ic">↔️</span><div><h4>Shifting &amp; Shutouts</h4><p>Every move and every miss is tracked.</p></div></div>
+                            <div class="mag-index-item"><span class="mag-index-ic">📊</span><div><h4>Reports &amp; exports</h4><p>Compliance reporting is an export, not a reconstruction.</p></div></div>
                         </div>
                         <p style="margin-top:2rem"><a href="system.html" class="lp-btn-ghost">Read the full operational flow →</a></p>
                     </div>
@@ -78,7 +79,8 @@
         </section>
 
         <!-- PHOTO BREAK -->
-        <div class="mag-photo-break" style="background-image:url('https://images.unsplash.com/photo-1634646809203-f3b4adff9127?auto=format&amp;fit=crop&amp;w=2200&amp;q=65')">
+        <div class="mag-photo-break">
+            <div class="mag-photo-break-media" style="background-image:url('https://images.unsplash.com/photo-1634646809203-f3b4adff9127?auto=format&amp;fit=crop&amp;w=2200&amp;q=65')"></div>
             <div class="mag-photo-break-cap">Empty container stacks · Yard &amp; Quayside staging</div>
         </div>
 
@@ -1204,6 +1206,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="script.js"></script>
+    <script src="cinematic.js"></script>
 
     <div class="container">
         <div id="foot">
