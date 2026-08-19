@@ -35,9 +35,7 @@ function tsAddOptions(id, opts) {
 }
 
 // ═══ AUTH ═══
-// Legacy local demo logins stay available as a fallback (useful offline / for quick demos).
-// Any username containing '@' is treated as a real Supabase Auth account instead.
-const USERS = { Admin: '0101', Clerk: '1234', Supervisor: '5678', Manager: '9999' };
+// Email/password sign-in via Supabase Auth only.
 let currentUser = null;
 let currentProfile = null;
 
@@ -92,46 +90,38 @@ window.doLogin = async () => {
     const p = document.getElementById('loginPass').value.trim();
     const errEl = document.getElementById('loginError');
     errEl.style.display = 'none';
-    if (!u || !p) { errEl.textContent = '⚠️ Enter both username/email and password.'; errEl.style.display = 'block'; return; }
+    if (!u || !p) { errEl.textContent = '⚠️ Enter both email and password.'; errEl.style.display = 'block'; return; }
 
-    if (u.includes('@')) {
-        // Real Supabase Auth account
-        const { data, error } = await sb.auth.signInWithPassword({ email: u, password: p });
-        if (error || !data.session) {
-            errEl.textContent = '⚠️ Invalid credentials. Access denied.'; errEl.style.display = 'block';
-            document.getElementById('loginPass').value = ''; document.getElementById('loginPass').focus();
-            return;
-        }
-        const { data: profile, error: pErr } = await sb.from('profiles').select('*').eq('id', data.user.id).single();
-        if (pErr || !profile) {
-            await sb.auth.signOut();
-            errEl.textContent = '⚠️ No profile found for this account. Contact an administrator.'; errEl.style.display = 'block';
-            return;
-        }
-        if (profile.status !== 'approved') {
-            await sb.auth.signOut();
-            const msg = profile.status === 'pending' ? '⏳ Your account is pending administrator approval.' :
-                profile.status === 'rejected' ? '⛔ Your account registration was not approved.' :
-                    '🚫 Your account has been suspended. Contact an administrator.';
-            errEl.textContent = msg; errEl.style.display = 'block';
-            return;
-        }
-        currentProfile = profile;
-        document.getElementById('loginPass').value = '';
-        await enterApp(profile.full_name || profile.email, ROLE_LABELS[profile.role] || profile.role);
-        return;
-    }
-
-    // Legacy local demo login
-    if (USERS[u] && USERS[u] === p) {
-        currentProfile = null;
-        document.getElementById('loginPass').value = '';
-        await enterApp(u, 'Local Demo Account');
-    } else {
+    if (!u.includes('@')) {
         errEl.textContent = '⚠️ Invalid credentials. Access denied.'; errEl.style.display = 'block';
         document.getElementById('loginPass').value = '';
         document.getElementById('loginPass').focus();
+        return;
     }
+
+    const { data, error } = await sb.auth.signInWithPassword({ email: u, password: p });
+    if (error || !data.session) {
+        errEl.textContent = '⚠️ Invalid credentials. Access denied.'; errEl.style.display = 'block';
+        document.getElementById('loginPass').value = ''; document.getElementById('loginPass').focus();
+        return;
+    }
+    const { data: profile, error: pErr } = await sb.from('profiles').select('*').eq('id', data.user.id).single();
+    if (pErr || !profile) {
+        await sb.auth.signOut();
+        errEl.textContent = '⚠️ No profile found for this account. Contact an administrator.'; errEl.style.display = 'block';
+        return;
+    }
+    if (profile.status !== 'approved') {
+        await sb.auth.signOut();
+        const msg = profile.status === 'pending' ? '⏳ Your account is pending administrator approval.' :
+            profile.status === 'rejected' ? '⛔ Your account registration was not approved.' :
+                '🚫 Your account has been suspended. Contact an administrator.';
+        errEl.textContent = msg; errEl.style.display = 'block';
+        return;
+    }
+    currentProfile = profile;
+    document.getElementById('loginPass').value = '';
+    await enterApp(profile.full_name || profile.email, ROLE_LABELS[profile.role] || profile.role);
 };
 
 window.doSignup = async () => {
