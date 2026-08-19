@@ -15,6 +15,7 @@
     async function loadStatus() {
         const board = document.getElementById('statusBoard');
         const meta = document.getElementById('statusUpdated');
+        const heroText = document.getElementById('heroLiveText');
         if (!board || typeof sb === 'undefined') return;
         try {
             const { data, error } = await sb.rpc('get_public_terminal_status');
@@ -25,8 +26,10 @@
             if (cells[2]) cells[2].textContent = data.quayside_staged;
             if (cells[3]) cells[3].textContent = data.on_wagon_sgr;
             if (meta) meta.textContent = `Updated ${timeAgo(data.generated_at)}`;
+            if (heroText) heroText.textContent = `${data.gated_in_yard} gated in yard · ${data.quayside_staged} quayside staged · updated ${timeAgo(data.generated_at)}`;
         } catch (e) {
             if (meta) meta.textContent = 'Status temporarily unavailable';
+            if (heroText) heroText.textContent = 'Terminal status temporarily unavailable';
             console.error('Public status fetch error:', e);
         }
     }

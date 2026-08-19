@@ -30,16 +30,19 @@
         </nav>
 
         <!-- HERO -->
-        <header class="mag-hero" style="min-height:64vh">
+        <header class="mag-hero mag-hero-compact" style="min-height:38vh">
             <div class="hero-layer" style="background-image:url('https://images.unsplash.com/photo-1759216373394-91146ca977c7?auto=format&amp;fit=crop&amp;w=2400&amp;q=70')"></div>
             <div class="mag-hero-inner">
-                <div class="mag-kicker">Mombasa MCT &nbsp;·&nbsp; Live Terminal Status</div>
-                <h1 class="mag-hero-h1">Gate, yard and quayside<br><em>status — as it stands.</em></h1>
-                <p class="mag-hero-sub">Current operational figures and posted advisories for Kenya Ports Authority's Empty Containers Terminal — traffic on the approach roads, gate backlog, and capacity or line communications affecting today's movements.</p>
+                <div class="mag-kicker">Mombasa MCT</div>
+                <h1 class="mag-hero-h1">Gate, yard and quayside status.</h1>
+                <p class="mag-hero-sub hero-live">
+                    <span class="live-dot">Live</span>
+                    <span class="hero-live-text" id="heroLiveText">Loading current terminal figures…</span>
+                </p>
                 <div class="mag-hero-row">
                     <div class="mag-hero-cta">
                         <button class="lp-btn-primary" onclick="showAuth('signin')">Access Portal</button>
-                        <a href="#status" class="lp-btn-ghost">View current status ↓</a>
+                        <a href="#status" class="lp-btn-ghost">View full status ↓</a>
                     </div>
                 </div>
             </div>
@@ -78,30 +81,6 @@
             <div class="mag-photo-break-media" style="background-image:url('https://images.unsplash.com/photo-1634646809203-f3b4adff9127?auto=format&amp;fit=crop&amp;w=2200&amp;q=65')"></div>
             <div class="mag-photo-break-cap">Empty container stacks · Yard &amp; Quayside staging</div>
         </div>
-
-        <!-- CONNECTED NETWORKS -->
-        <section class="mag-section">
-            <div class="mag-inner">
-                <div class="mag-section-head"><span class="mag-section-num">03</span><h2>Connected systems</h2></div>
-                <p class="mag-lede">ECOMS operates as part of the wider Mombasa container corridor, alongside the depot and regulatory systems the terminal coordinates with.</p>
-                <div class="network-grid">
-                    <div class="network-card">
-                        <h4>⚓ ECOMS</h4>
-                        <p>Kenya Ports Authority's own system of record for gate‑in, yard, quayside, SGR rail and vessel loading at the Empty Containers Terminal, Mombasa.</p>
-                    </div>
-                    <div class="network-card">
-                        <h4>🏭 Gargo TMS</h4>
-                        <p>Depot-side terminal management system used by corridor depot operators for yard and dispatch operations.</p>
-                        <a href="https://gargo-tms.co.ke" target="_blank" rel="noopener">gargo-tms.co.ke ↗</a>
-                    </div>
-                    <div class="network-card">
-                        <h4>🧭 TRAFCOMS</h4>
-                        <p>Kenya Maritime Authority oversight platform for empty‑container depots on the Mombasa corridor — regulatory visibility across connected depots, shipping lines and transporters.</p>
-                        <a href="https://trafcoms-web.vercel.app" target="_blank" rel="noopener">trafcoms-web.vercel.app ↗</a>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <!-- CTA -->
         <section class="mag-cta-band">
