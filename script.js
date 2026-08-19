@@ -67,7 +67,7 @@ window.toggleSignupOrgField = () => {
     document.getElementById('suOrgField').classList.toggle('hidden', !ORG_ROLES.includes(role));
 };
 
-const ROLE_LABELS = { admin: 'Administrator', kpa_employee: 'KPA Employee', kpa_clerk: 'KPA Clerk', kpa_dispatcher: 'KPA Dispatcher', kpa_machine_operator: 'KPA Machine Operator', kpa_supervisor: 'KPA Supervisor', terminal_supervisor: 'Terminal Supervisor', yard_manager: 'Yard Manager', port_user: 'Port User', transporter: 'Transporter', depot_operator: 'Depot Operator', agent_clerk: 'Agent / Clerk', clearing_agent: 'Clearing Agent' };
+const ROLE_LABELS = { unassigned: 'Unassigned — no rights yet', admin: 'Administrator', kpa_employee: 'KPA Employee', kpa_clerk: 'KPA Clerk', kpa_dispatcher: 'KPA Dispatcher', kpa_machine_operator: 'KPA Machine Operator', kpa_supervisor: 'KPA Supervisor', terminal_supervisor: 'Terminal Supervisor', yard_manager: 'Yard Manager', port_user: 'Port User', transporter: 'Transporter', depot_operator: 'Depot Operator', agent_clerk: 'Agent / Clerk', clearing_agent: 'Clearing Agent' };
 
 async function enterApp(displayName, roleLabel) {
     currentUser = displayName;
@@ -1385,7 +1385,8 @@ async function renderApprovals() {
             actions.push(`<button class="btn btn-xs btn-success" onclick="approveUser('${p.id}')">✅ Reactivate</button>`);
         }
         const roleSelect = p.role === 'admin' ? `<span class="badge b-loaded">Administrator</span>` :
-            `<select class="tbl-inline-select" onchange="changeUserRole('${p.id}',this.value)">${roleOptions.replace(`value="${p.role}"`, `value="${p.role}" selected`)}</select>`;
+            `<select class="tbl-inline-select" onchange="changeUserRole('${p.id}',this.value)">${roleOptions.replace(`value="${p.role}"`, `value="${p.role}" selected`)}</select>` +
+            (p.status === 'pending' && p.requested_role && p.requested_role !== p.role ? `<div class="text-xs text-muted" style="margin-top:2px">Applied for: ${ROLE_LABELS[p.requested_role] || p.requested_role}</div>` : '');
         return `<tr>
       <td>${p.full_name || '—'}</td>
       <td>${p.email}</td>
