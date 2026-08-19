@@ -1,10 +1,9 @@
-
 (function () {
     var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     var selectors = [
-        '.mag-section-head', '.mag-lede', '.mag-index-item', '.mag-flow-row',
-        '.mag-figure', '.mag-pullquote', '.mag-role-cell', '.mag-contact-card'
+        '.mag-section-head', '.mag-lede', '.status-cell', '.advisory-card',
+        '.network-card', '.mag-contact-card'
     ];
     var targets = document.querySelectorAll(selectors.join(','));
 
@@ -15,7 +14,7 @@
 
     targets.forEach(function (el, i) {
         el.classList.add('reveal-target');
-        el.style.transitionDelay = (i % 6) * 0.06 + 's';
+        el.style.transitionDelay = (i % 6) * 0.05 + 's';
     });
 
     var io = new IntersectionObserver(function (entries) {

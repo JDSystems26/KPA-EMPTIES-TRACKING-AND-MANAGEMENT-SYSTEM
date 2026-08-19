@@ -23,8 +23,6 @@
                 <div class="lp-brand"><span class="lp-brand-emblem">⚓</span> ECOMS</div>
                 <div class="site-nav-links">
                     <a href="index.html" class="is-active">Home</a>
-                    <a href="system.html">System</a>
-                    <a href="security.html">Security</a>
                     <a href="contact.html">Contact</a>
                 </div>
                 <button class="lp-btn-portal" onclick="showAuth('signin')">Access Portal →</button>
@@ -32,48 +30,45 @@
         </nav>
 
         <!-- HERO -->
-        <header class="mag-hero">
-            <div class="hero-layer hero-layer-a" style="background-image:url('https://images.unsplash.com/photo-1759216373394-91146ca977c7?auto=format&amp;fit=crop&amp;w=2400&amp;q=70')"></div>
-            <div class="hero-layer hero-layer-b" style="background-image:url('https://images.unsplash.com/photo-1759216373582-a24c4a65b031?auto=format&amp;fit=crop&amp;w=2400&amp;q=70')"></div>
+        <header class="mag-hero" style="min-height:64vh">
+            <div class="hero-layer" style="background-image:url('https://images.unsplash.com/photo-1759216373394-91146ca977c7?auto=format&amp;fit=crop&amp;w=2400&amp;q=70')"></div>
             <div class="mag-hero-inner">
-                <div class="mag-kicker">Mombasa MCT &nbsp;·&nbsp; Terminal Operations</div>
-                <h1 class="mag-hero-h1">Every container.<br>One record.<br><em>Zero guesswork.</em></h1>
-                <p class="mag-hero-sub">Management and tracking system for empty‑container gate‑in, yard, quayside, SGR rail and vessel loading operations at Kenya Ports Authority's Empty Containers Terminal — built so a container's status is never a matter of who you called last.</p>
+                <div class="mag-kicker">Mombasa MCT &nbsp;·&nbsp; Live Terminal Status</div>
+                <h1 class="mag-hero-h1">Gate, yard and quayside<br><em>status — as it stands.</em></h1>
+                <p class="mag-hero-sub">Current operational figures and posted advisories for Kenya Ports Authority's Empty Containers Terminal — traffic on the approach roads, gate backlog, and capacity or line communications affecting today's movements.</p>
                 <div class="mag-hero-row">
                     <div class="mag-hero-cta">
                         <button class="lp-btn-primary" onclick="showAuth('signin')">Access Portal</button>
-                        <a href="system.html" class="lp-btn-ghost">See how it works →</a>
-                    </div>
-                    <div class="mag-stat-row">
-                        <div class="mag-stat"><strong>17</strong><span>Operational modules</span></div>
-                        <div class="mag-stat"><strong>Real‑time</strong><span>Cloud sync</span></div>
-                        <div class="mag-stat"><strong>100%</strong><span>Actions audited</span></div>
+                        <a href="#status" class="lp-btn-ghost">View current status ↓</a>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- OVERVIEW -->
-        <section class="mag-section">
+        <!-- LIVE STATUS -->
+        <section class="mag-section-tight" id="status">
             <div class="mag-inner">
-                <div class="mag-split">
-                    <div>
-                        <div class="mag-section-head"><span class="mag-section-num">01</span><h2>A single source of truth</h2></div>
-                        <p class="mag-lede mag-dropcap">Gate clerks, yard controllers, quayside operators, SGR rail staff and vessel loading teams have historically worked from separate log books, radios and memory. ECOMS gives every role the same live container record — checked once, trusted at every stage downstream.</p>
-                        <div class="mag-index-grid">
-                            <div class="mag-index-item"><span class="mag-index-ic">📋</span><div><h4>Pre‑advice &amp; Gate In</h4><p>Registered before arrival, captured once at the barrier.</p></div></div>
-                            <div class="mag-index-item"><span class="mag-index-ic">🏗️</span><div><h4>Yard &amp; Quayside staging</h4><p>Location and clerk logged the moment it happens.</p></div></div>
-                            <div class="mag-index-item"><span class="mag-index-ic">🚂</span><div><h4>SGR Rail integration</h4><p>Received off rail into the same live record.</p></div></div>
-                            <div class="mag-index-item"><span class="mag-index-ic">🛳️</span><div><h4>Vessel Loading</h4><p>Random‑load detection built into every load.</p></div></div>
-                            <div class="mag-index-item"><span class="mag-index-ic">↔️</span><div><h4>Shifting &amp; Shutouts</h4><p>Every move and every miss is tracked.</p></div></div>
-                            <div class="mag-index-item"><span class="mag-index-ic">📊</span><div><h4>Reports &amp; exports</h4><p>Compliance reporting is an export, not a reconstruction.</p></div></div>
-                        </div>
-                        <p style="margin-top:2rem"><a href="system.html" class="lp-btn-ghost">Read the full operational flow →</a></p>
-                    </div>
-                    <figure class="mag-figure">
-                        <img src="https://images.unsplash.com/photo-1759216373582-a24c4a65b031?auto=format&amp;fit=crop&amp;w=1200&amp;q=70" alt="Container ship loading with cranes and forklift at port" loading="lazy">
-                        <figcaption class="mag-figure-cap">Quayside loading operations · Mombasa MCT</figcaption>
-                    </figure>
+                <div class="mag-section-head"><span class="mag-section-num">01</span><h2>Current terminal status</h2></div>
+                <div class="status-board" id="statusBoard">
+                    <div class="status-cell"><strong>—</strong><span>Pre‑advised, awaiting gate</span></div>
+                    <div class="status-cell"><strong>—</strong><span>Gated in / in yard</span></div>
+                    <div class="status-cell"><strong>—</strong><span>Quayside staged</span></div>
+                    <div class="status-cell"><strong>—</strong><span>On wagon / SGR</span></div>
+                </div>
+                <div class="status-meta">
+                    <span class="live-dot">Live from ECOMS</span>
+                    <span id="statusUpdated">Loading current figures…</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADVISORIES -->
+        <section class="mag-section mag-section-alt">
+            <div class="mag-inner">
+                <div class="mag-section-head"><span class="mag-section-num">02</span><h2>Advisories &amp; communications</h2></div>
+                <p class="mag-lede">Traffic conditions, gate backlog notices and capacity or line-specific communications, posted directly by terminal control.</p>
+                <div class="advisory-list" id="advisoryList">
+                    <div class="advisory-loading">Loading current advisories…</div>
                 </div>
             </div>
         </section>
@@ -84,19 +79,25 @@
             <div class="mag-photo-break-cap">Empty container stacks · Yard &amp; Quayside staging</div>
         </div>
 
-        <!-- TRUST TEASER -->
-        <section class="mag-section mag-section-alt">
+        <!-- CONNECTED NETWORKS -->
+        <section class="mag-section">
             <div class="mag-inner">
-                <div class="mag-split mag-split-reverse">
-                    <figure class="mag-figure">
-                        <img src="https://images.unsplash.com/photo-1759273560543-7f0e66af2a4d?auto=format&amp;fit=crop&amp;w=1200&amp;q=70" alt="Cargo ship docked at a port with large cranes" loading="lazy">
-                        <figcaption class="mag-figure-cap">Vessel berth · Mombasa MCT</figcaption>
-                    </figure>
-                    <div>
-                        <div class="mag-section-head"><span class="mag-section-num">02</span><h2>Built on trust, not trust me</h2></div>
-                        <p class="mag-lede">Access control is enforced by the database, not the interface — with role‑based accounts, an append‑only audit trail and approval‑gated registration for every new user.</p>
-                        <blockquote class="mag-pullquote">"Every action is written to a log, attributed to the account that performed it, and never silently overwritten."<cite>Security model · ECOMS</cite></blockquote>
-                        <p><a href="security.html" class="lp-btn-ghost">See security &amp; account types →</a></p>
+                <div class="mag-section-head"><span class="mag-section-num">03</span><h2>Connected systems</h2></div>
+                <p class="mag-lede">ECOMS operates as part of the wider Mombasa container corridor, alongside the depot and regulatory systems the terminal coordinates with.</p>
+                <div class="network-grid">
+                    <div class="network-card">
+                        <h4>⚓ ECOMS</h4>
+                        <p>Kenya Ports Authority's own system of record for gate‑in, yard, quayside, SGR rail and vessel loading at the Empty Containers Terminal, Mombasa.</p>
+                    </div>
+                    <div class="network-card">
+                        <h4>🏭 Gargo TMS</h4>
+                        <p>Depot-side terminal management system used by corridor depot operators for yard and dispatch operations.</p>
+                        <a href="https://gargo-tms.co.ke" target="_blank" rel="noopener">gargo-tms.co.ke ↗</a>
+                    </div>
+                    <div class="network-card">
+                        <h4>🧭 TRAFCOMS</h4>
+                        <p>Kenya Maritime Authority oversight platform for empty‑container depots on the Mombasa corridor — regulatory visibility across connected depots, shipping lines and transporters.</p>
+                        <a href="https://trafcoms-web.vercel.app" target="_blank" rel="noopener">trafcoms-web.vercel.app ↗</a>
                     </div>
                 </div>
             </div>
@@ -115,8 +116,6 @@
                     <div class="lp-brand"><span class="lp-brand-emblem">⚓</span> ECOMS</div>
                     <div class="site-footer-links">
                         <a href="index.html">Home</a>
-                        <a href="system.html">System</a>
-                        <a href="security.html">Security</a>
                         <a href="contact.html">Contact</a>
                     </div>
                 </div>
@@ -227,6 +226,7 @@
             <div class="nav-item" data-tab="logs"><span class="ni">📜</span>Audit Logs</div>
             <div class="sb-section hidden" id="sbAdminSection">Administration</div>
             <div class="nav-item hidden" id="navApprovals" data-tab="approvals"><span class="ni">🛂</span>User Approvals <span class="nav-badge" id="nb-approvals">0</span></div>
+            <div class="nav-item hidden" id="navAdvisories" data-tab="advisories"><span class="ni">📢</span>Advisories</div>
             <div class="sb-user">
                 <div class="sb-user-info">
                     <div class="sb-avatar" id="sbAvatar">A</div>
@@ -1159,6 +1159,50 @@
                 </div>
             </div>
 
+            <!-- ─── ADVISORIES (admin only) ─── -->
+            <div class="tab-pane" id="tab-advisories">
+                <div class="page-hdr">
+                    <div><h2>Advisories</h2><div class="sub">Public bulletins shown on the ECOMS landing page — traffic, gate backlog, capacity &amp; line communications</div></div>
+                    <button class="btn btn-sm btn-secondary" onclick="renderAdvisoriesAdmin()">🔄 Refresh</button>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-title">📢 Post a new advisory</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="advCategory">
+                                <option value="traffic">Traffic — approach roads</option>
+                                <option value="gate_backlog">Gate backlog</option>
+                                <option value="capacity">Capacity constraint</option>
+                                <option value="communications">Line communication</option>
+                                <option value="general">General</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Severity</label>
+                            <select id="advSeverity">
+                                <option value="info">Info</option>
+                                <option value="advisory" selected>Advisory</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Scope (line / area, optional)</label><input id="advScope" placeholder="e.g. MSC, or leave blank for ALL"></div>
+                        <div class="form-group" style="grid-column:1/-1"><label>Title</label><input id="advTitle" placeholder="Short headline"></div>
+                        <div class="form-group" style="grid-column:1/-1"><label>Message</label><textarea id="advMessage" rows="3" placeholder="Factual detail — what's happening, and what it means for whoever is reading this before they travel or dispatch."></textarea></div>
+                    </div>
+                    <button class="btn btn-primary btn-sm mt-2" onclick="createAdvisory()">📤 Publish advisory</button>
+                </div>
+                <div class="card">
+                    <div class="card-title">🗞️ Current &amp; recent advisories</div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Status</th><th>Category</th><th>Severity</th><th>Title</th><th>Scope</th><th>Posted</th><th>Actions</th></tr></thead>
+                            <tbody id="advisoriesBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -1206,6 +1250,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="script.js"></script>
+    <script src="landing-status.js"></script>
     <script src="cinematic.js"></script>
 
     <div class="container">

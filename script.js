@@ -81,6 +81,7 @@ async function enterApp(displayName, roleLabel) {
     const isAdmin = currentProfile && currentProfile.role === 'admin';
     document.getElementById('sbAdminSection').classList.toggle('hidden', !isAdmin);
     document.getElementById('navApprovals').classList.toggle('hidden', !isAdmin);
+    document.getElementById('navAdvisories').classList.toggle('hidden', !isAdmin);
     await loadAll();
     toast(`👋 Welcome, ${displayName}! ECOMS · Mombasa MCT`, 'success');
     initAllSearchableDropdowns();
@@ -1414,6 +1415,60 @@ window.changeUserRole = async (id, role) => {
     renderApprovals();
 };
 
+// ═══ ADVISORIES (public landing-page bulletins) ═══
+const ADV_CATEGORY_LABELS = { traffic: 'Traffic', gate_backlog: 'Gate backlog', capacity: 'Capacity', communications: 'Line communication', general: 'General' };
+const ADV_SEVERITY_LABELS = { info: 'Info', advisory: 'Advisory', urgent: 'Urgent' };
+
+async function renderAdvisoriesAdmin() {
+    const { data, error } = await sb.from('advisories').select('*').order('created_at', { ascending: false }).limit(100);
+    if (error) { toast('⚠️ Could not load advisories: ' + error.message, 'error'); return; }
+    const tbody = document.getElementById('advisoriesBody');
+    if (!tbody) return;
+    tbody.innerHTML = (data || []).map(a => `<tr>
+      <td>${a.active ? '<span class="badge b-gated">Active</span>' : '<span class="badge b-out">Inactive</span>'}</td>
+      <td>${ADV_CATEGORY_LABELS[a.category] || a.category}</td>
+      <td>${ADV_SEVERITY_LABELS[a.severity] || a.severity}</td>
+      <td>${a.title}</td>
+      <td>${a.scope || 'ALL'}</td>
+      <td style="font-size:0.7rem">${new Date(a.created_at).toLocaleString()}</td>
+      <td class="btn-group">
+        <button class="btn btn-secondary btn-sm" onclick="toggleAdvisory('${a.id}', ${!a.active})">${a.active ? '🔕 Deactivate' : '🔔 Reactivate'}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteAdvisory('${a.id}')">🗑️</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="7" class="text-muted" style="text-align:center;padding:1.5rem">No advisories posted yet</td></tr>';
+}
+
+window.createAdvisory = async () => {
+    const title = document.getElementById('advTitle').value.trim();
+    const message = document.getElementById('advMessage').value.trim();
+    if (!title || !message) { toast('⚠️ Title and message are required', 'error'); return; }
+    const payload = {
+        category: document.getElementById('advCategory').value,
+        severity: document.getElementById('advSeverity').value,
+        scope: document.getElementById('advScope').value.trim() || 'ALL',
+        title, message, active: true,
+    };
+    const { error } = await sb.from('advisories').insert(payload);
+    if (error) { toast('⚠️ Could not publish advisory: ' + error.message, 'error'); return; }
+    toast('📤 Advisory published to the landing page', 'success');
+    document.getElementById('advTitle').value = ''; document.getElementById('advMessage').value = ''; document.getElementById('advScope').value = '';
+    renderAdvisoriesAdmin();
+};
+
+window.toggleAdvisory = async (id, active) => {
+    const { error } = await sb.from('advisories').update({ active, updated_at: new Date().toISOString() }).eq('id', id);
+    if (error) { toast('⚠️ Could not update advisory: ' + error.message, 'error'); return; }
+    renderAdvisoriesAdmin();
+};
+
+window.deleteAdvisory = async (id) => {
+    if (!confirm('Delete this advisory permanently?')) return;
+    const { error } = await sb.from('advisories').delete().eq('id', id);
+    if (error) { toast('⚠️ Could not delete advisory: ' + error.message, 'error'); return; }
+    toast('🗑️ Advisory deleted', 'success');
+    renderAdvisoriesAdmin();
+};
+
 async function resetAllSystemData() {
     if (!confirm('!!! DANGER !!! This will erase ALL terminal data (local AND Supabase). This action is irreversible. Proceed?')) return;
     const check = prompt('Type "CONFIRM" to delete all data:');
@@ -1560,6 +1615,7 @@ document.querySelectorAll('.nav-item, .mob-item').forEach(el => {
         if (tab === 'yard') renderYardBlocks();
         if (tab === 'vessel') renderVessel();
         if (tab === 'approvals') renderApprovals();
+        if (tab === 'advisories') renderAdvisoriesAdmin();
         populateAllDropdowns();
     });
 });
